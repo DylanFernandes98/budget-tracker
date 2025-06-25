@@ -25,4 +25,4 @@ A simple personal finance tracker built with Python. This desktop app lets you r
    cd budget-tracker
 2. Run the application:
    ```bash
-   python budget.py
+   python main.py
