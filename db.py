@@ -1,8 +1,10 @@
 import sqlite3
 import pandas as pd
 
-# Function to initialise the database and table
 def initialise_database():
+    """
+    Creates the SQLite database and a 'transactions' table if it doesn't already exist.
+    """
     with sqlite3.connect('budget.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
@@ -15,8 +17,10 @@ def initialise_database():
             )
         ''')
 
-# Add a transaction
 def add_transaction(date, amount, category, description):
+    """
+    Inserts a new transaction record into the database.
+    """
     with sqlite3.connect('budget.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
@@ -25,13 +29,19 @@ def add_transaction(date, amount, category, description):
         ''', (date, amount, category, description))
         conn.commit()
 
-# Get all transactions as a DataFrame
 def get_all_transactions():
+    """
+    Retrieves all transactions from the database as a pandas DataFrame.
+    Returns the dataframe with all transaction records, ordered by date descending.
+    """
     with sqlite3.connect('budget.db') as conn:
         return pd.read_sql('SELECT * FROM transactions ORDER BY date DESC', conn)
 
-# Delete the most recent transaction
 def delete_latest_transaction():
+    """
+    Deletes the most recently added transaction from the database.
+    Returns int or None (ID of the deleted transaction or None if there are no records).
+    """
     with sqlite3.connect('budget.db') as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT MAX(id) FROM transactions")
@@ -43,15 +53,20 @@ def delete_latest_transaction():
             return latest_id
         return None
 
-# Delete all transactions
 def delete_all_transactions():
+    """
+    Deletes all transaction records from the database.
+    """
     with sqlite3.connect('budget.db') as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM transactions")
         conn.commit()
 
-# Get total of all amounts
 def get_total_amount():
+    """
+    Calculates the total sum of all transaction amounts.
+    Returns float or None (Total amount spent or 0.0 if no records exist.)
+    """
     with sqlite3.connect('budget.db') as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT SUM(amount) FROM transactions")
