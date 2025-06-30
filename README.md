@@ -4,7 +4,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 ## 🖼️ Preview
 
-![App Screenshot](./screenshot.jpg)
+![App Screenshot](./screenshot.JPG)
 
 ## ✨ Features
 
