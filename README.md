@@ -2,6 +2,10 @@
 
 A simple personal finance tracker built with Python. This desktop app lets you record income and expenses, view transactions, and keep track of your budget in real time. It features a minimal interface built with Tkinter and uses SQLite for data storage.
 
+## 🖼️ Preview
+
+![App Screenshot](./screenshot.jpg)
+
 ## ✨ Features
 
 - Add income or expense transactions with date, category, amount, and description  
@@ -26,3 +30,4 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 2. **Run the application**
    ```bash
    python main.py
+
