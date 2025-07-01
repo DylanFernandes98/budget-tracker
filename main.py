@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
+from datetime import date
+from tkcalendar import DateEntry
 from db import (
     initialise_database, add_transaction, get_all_transactions,
     delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
@@ -33,8 +35,8 @@ class BudgetApp:
         self.welcome_label.grid(row=0, column=0, columnspan=3, pady=10)
 
         # --- Input Fields ---
-        tk.Label(self.root, text="Date (YYYY-MM-DD)", bg=bg_color).grid(row=1, column=0)
-        self.date_entry = tk.Entry(self.root)
+        tk.Label(self.root, text="Date", bg=bg_color).grid(row=1, column=0)
+        self.date_entry = DateEntry(self.root, width=18, date_pattern='dd-mm-yyyy', maxdate=date.today(), state='readonly')
         self.date_entry.grid(row=1, column=1)
 
         tk.Label(self.root, text="Amount", bg=bg_color).grid(row=2, column=0)
@@ -86,13 +88,6 @@ class BudgetApp:
         # Ensure all fields are filled
         if not all([date, amount, category, description]):
             self.status_label.config(text="All fields must be filled in.", fg="red")
-            return
-
-        # Validate the date format
-        try:
-            datetime.strptime(date, '%Y-%m-%d')
-        except ValueError:
-            self.status_label.config(text="Date must be in 'YYYY-MM-DD' format.", fg="red")
             return
 
         # Validate amount is a positive number
