@@ -1,3 +1,5 @@
+import platform
+
 # --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -26,7 +28,8 @@ class BudgetApp:
         self.root.option_add('*Font', ('Segoe UI', 11))
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
-        self.root.state('zoomed')
+        if platform.system() == 'Windows':
+            self.root.state('zoomed')
 
         #--- Main centered frame ---
         self.main_frame = tk.Frame(self.root, bg='#D7E3F4')
