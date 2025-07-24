@@ -1,5 +1,6 @@
 pandas
 tk
 tkCalendar
+matplotlib
 pytest
 flake8

@@ -1,13 +1,20 @@
+# --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
-from datetime import datetime
-from datetime import date
+
+# --- Date handling ---
+from datetime import datetime, date
 from tkcalendar import DateEntry
+
+# --- Database functions ---
 from db import (
     initialise_database, add_transaction, get_all_transactions,
     delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
     get_total_amount
 )
+# --- Graphing (matplotlib inside Tkinter) ---
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class BudgetApp:
     """
@@ -19,10 +26,15 @@ class BudgetApp:
         self.root.option_add('*Font', ('Segoe UI', 11))
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
+        self.root.state('zoomed')
+
+        #--- Main centered frame ---
+        self.main_frame = tk.Frame(self.root, bg='#D7E3F4')
+        self.main_frame.pack(expand=True, anchor='n', pady=20)
         
         self.setup() # Initialise the GUI layout
         self.update_transaction_list() # Populate the data
-        self.welcome_label.config(text="Welcome to my budget tracker app!", font='bold')
+        self.welcome_label.config(text="Welcome to my budget tracker app!", font='bold', pady=20)
 
     def setup(self):
         """
@@ -31,50 +43,57 @@ class BudgetApp:
         bg_color = '#D7E3F4'
 
         # --- Welcome Label ---
-        self.welcome_label = tk.Label(self.root, text="", bg=bg_color)
+        self.welcome_label = tk.Label(self.main_frame, text="", bg=bg_color)
         self.welcome_label.grid(row=0, column=0, columnspan=3, pady=10)
 
         # --- Input Fields ---
-        tk.Label(self.root, text="Date", bg=bg_color).grid(row=1, column=0)
-        self.date_entry = DateEntry(self.root, width=18, date_pattern='dd-mm-yyyy', maxdate=date.today(), state='readonly')
+        tk.Label(self.main_frame, text="Date", bg=bg_color).grid(row=1, column=0)
+        self.date_entry = DateEntry(self.main_frame, width=18, date_pattern='dd-mm-yyyy', maxdate=date.today(), state='readonly')
         self.date_entry.grid(row=1, column=1)
 
-        tk.Label(self.root, text="Amount", bg=bg_color).grid(row=2, column=0)
-        self.amount_entry = tk.Entry(self.root)
+        tk.Label(self.main_frame, text="Amount", bg=bg_color).grid(row=2, column=0)
+        self.amount_entry = tk.Entry(self.main_frame)
         self.amount_entry.grid(row=2, column=1)
 
-        tk.Label(self.root, text="Category", bg=bg_color).grid(row=3, column=0)
+        tk.Label(self.main_frame, text="Category", bg=bg_color).grid(row=3, column=0)
         self.category_var = tk.StringVar()
-        self.category_dropdown = ttk.Combobox(self.root, width=18, textvariable=self.category_var,
+        self.category_dropdown = ttk.Combobox(self.main_frame, width=18, textvariable=self.category_var,
             values=['Food', 'Drinks', 'Entertainment', 'Transport', 'Holidays', 'Other'], state='readonly')
         self.category_dropdown.grid(row=3, column=1)
 
-        tk.Label(self.root, text="Description", bg=bg_color).grid(row=4, column=0)
-        self.description_entry = tk.Entry(self.root)
+        tk.Label(self.main_frame, text="Description", bg=bg_color).grid(row=4, column=0)
+        self.description_entry = tk.Entry(self.main_frame)
         self.description_entry.grid(row=4, column=1)
 
         # --- Buttons ---
-        clear_button = tk.Button(self.root, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
+        clear_button = tk.Button(self.main_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
         clear_button.grid(row=5, column=0, columnspan=3, pady=10)
 
-        delete_button = tk.Button(self.root, text="Delete transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
+        delete_button = tk.Button(self.main_frame, text="Delete transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
         delete_button.grid(row=6, column=0, pady=10)
 
-        delete_all_button = tk.Button(self.root, text="Delete all transactions", command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
+        delete_all_button = tk.Button(self.main_frame, text="Delete all transactions", command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
         delete_all_button.grid(row=6, column=1, pady=10)
 
-        submit_button = tk.Button(self.root, text="Add Transaction", command=self.submit_transaction, fg='white', bg='#4CAF50')
+        submit_button = tk.Button(self.main_frame, text="Add Transaction", command=self.submit_transaction, fg='white', bg='#4CAF50')
         submit_button.grid(row=6, column=2, pady=10)
 
+        graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.show_transaction_graph)
+        graph_button.grid(row=11, column=2, pady=10)
+
         # --- Status and Output Area ---
-        self.status_label = tk.Label(self.root, text="", bg=bg_color, fg="green")
+        self.status_label = tk.Label(self.main_frame, text="", bg=bg_color, fg="green")
         self.status_label.grid(row=7, column=0, columnspan=3)
 
-        self.text_output = tk.Text(self.root, height=15, width=60)
+        self.text_output = tk.Text(self.main_frame, height=15, width=60)
         self.text_output.grid(row=8, column=0, columnspan=3, padx=10, pady=10)
 
-        self.amount_spent = tk.Label(self.root, text="", bg=bg_color, fg="black", font='bold')
+        self.amount_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
         self.amount_spent.grid(row=9, column=0, columnspan=3, pady=10)
+
+        # --- Graph Area ---
+        self.graph_frame = tk.Frame(self.main_frame, bg='#D7E3F4')
+        self.graph_frame.grid(row=10, column=0, columnspan=3, pady=10)
 
     def submit_transaction(self):
         """
@@ -164,6 +183,44 @@ class BudgetApp:
             self.update_transaction_list()
         else:
             self.status_label.config(text="Delete cancelled.", fg="red")
+
+    def show_transaction_graph(self):
+        """
+        Displays a bar chart of the total amount spent per category inside the Tkinter window
+        """
+        df = get_all_transactions()
+        if df.empty:
+            messagebox.showinfo("No data", "No transactions to show")
+
+        # Destroy old canvas if it exists
+        if hasattr(self, 'canvas') and self.canvas:
+            self.canvas.get_tk_widget().destroy()
+
+        # Group transactions by category, sum their amounts, and sort from lowest to highest
+        grouped = df.groupby('category')['amount'].sum().sort_values()
+
+        # Create a horizontal bar chart figure sized to match the layout
+        fig, ax = plt.subplots(figsize=(4.9, 2))
+        grouped.plot(kind='barh', ax=ax, color='#4CAF50')
+
+        # Set chart title and axis labels
+        ax.set_title('Total Spent per Category')
+        ax.set_xlabel('Amount (£)')
+        ax.set_ylabel('Category')
+
+        # Add padding to avoid clipping and improve layout
+        plt.subplots_adjust(left=0.4, right=0.95, top=0.85, bottom=0.3)
+
+        # Reduce font size of axis tick labels for a cleaner look
+        ax.tick_params(labelsize=9)
+
+        # Embed the Matplotlib figure into the Tkinter graph frame
+        self.canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack()
+
+        # Ensure the figure is closed to avoid lingering state
+        plt.close(fig)
 
 if __name__ == "__main__":
     # Initialise the DB and start the application
