@@ -25,18 +25,20 @@ class BudgetApp:
     """    
     def __init__(self, root):
         self.root = root
-        self.root.option_add('*Font', ('Segoe UI', 11))
+        self.root.option_add('*Font', ('Segoe UI', 14))
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
-        if platform.system() == 'Windows':
-            self.root.state('zoomed')
 
         #--- Main centered frame ---
         self.main_frame = tk.Frame(self.root, bg='#D7E3F4')
-        self.main_frame.pack(expand=True, anchor='n', pady=20)
+        self.main_frame.pack(pady=20) 
+
+        self.graph_visible = False # Tracks whether graph is currently visible
         
         self.setup() # Initialise the GUI layout
+
         self.update_transaction_list() # Populate the data
+        self.refresh_graph()
         self.welcome_label.config(text="Welcome to my budget tracker app!", font='bold', pady=20)
 
     def setup(self):
@@ -72,7 +74,7 @@ class BudgetApp:
         clear_button = tk.Button(self.main_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
         clear_button.grid(row=5, column=0, columnspan=3, pady=10)
 
-        delete_button = tk.Button(self.main_frame, text="Delete transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
+        delete_button = tk.Button(self.main_frame, text="Delete latest transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
         delete_button.grid(row=6, column=0, pady=10)
 
         delete_all_button = tk.Button(self.main_frame, text="Delete all transactions", command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
@@ -81,8 +83,9 @@ class BudgetApp:
         submit_button = tk.Button(self.main_frame, text="Add Transaction", command=self.submit_transaction, fg='white', bg='#4CAF50')
         submit_button.grid(row=6, column=2, pady=10)
 
-        graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.show_transaction_graph)
-        graph_button.grid(row=11, column=2, pady=10)
+        # Use 'self' to access button later in toggle transaction graph function
+        self.graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.toggle_transaction_graph)
+        self.graph_button.grid(row=10, column=2, pady=10)
 
         # --- Status and Output Area ---
         self.status_label = tk.Label(self.main_frame, text="", bg=bg_color, fg="green")
@@ -96,7 +99,7 @@ class BudgetApp:
 
         # --- Graph Area ---
         self.graph_frame = tk.Frame(self.main_frame, bg='#D7E3F4')
-        self.graph_frame.grid(row=10, column=0, columnspan=3, pady=10)
+        self.graph_frame.grid(row=11, column=0, columnspan=3, pady=10)
 
     def submit_transaction(self):
         """
@@ -132,6 +135,9 @@ class BudgetApp:
         self.status_label.config(text="Transaction added successfully.", fg="green")
         self.clear_form(show_status=False) # Keep the transaction message visible
         self.update_transaction_list()
+
+        # Call the function to refresh the graph
+        self.refresh_graph()
 
     def update_transaction_list(self):
         """
@@ -175,6 +181,9 @@ class BudgetApp:
         else:
             self.status_label.config(text="No transaction to delete.", fg="red")
 
+        # Call the function to refresh the graph
+        self.refresh_graph()
+
     def delete_all_transactions(self):
         """
         Deletes all the transactions (if there is any).
@@ -187,13 +196,16 @@ class BudgetApp:
         else:
             self.status_label.config(text="Delete cancelled.", fg="red")
 
+        # Call the function to refresh the graph
+        self.refresh_graph()
+
     def show_transaction_graph(self):
         """
-        Displays a bar chart of the total amount spent per category inside the Tkinter window
+        Displays a bar chart of the total amount spent per category inside the Tkinter window.
         """
         df = get_all_transactions()
         if df.empty:
-            messagebox.showinfo("No data", "No transactions to show")
+            return
 
         # Destroy old canvas if it exists
         if hasattr(self, 'canvas') and self.canvas:
@@ -224,10 +236,50 @@ class BudgetApp:
 
         # Ensure the figure is closed to avoid lingering state
         plt.close(fig)
+    
+    def toggle_transaction_graph(self):
+        """
+        Toggles the transaction graph so the user can show or hide it.
+        """
+        # Hide the graph
+        if self.graph_visible:
+            # Destroy old canvas if it exists
+            if hasattr(self, 'canvas') and self.canvas:
+                self.canvas.get_tk_widget().destroy()
+            self.graph_button.config(text="Show Graph")
+            self.graph_visible = False
+        # Show the graph
+        else:
+            self.show_transaction_graph()
+            self.graph_button.config(text="Hide Graph")
+            self.graph_visible = True
+
+    def refresh_graph(self):
+        """
+        Updates or removes the graph whether there is data
+        """
+        df = get_all_transactions()
+
+        if self.graph_visible:
+            # Destroy old canvas if it exists
+            if hasattr(self, 'canvas') and self.canvas:
+                self.canvas.get_tk_widget().destroy()
+
+        if df.empty:
+            self.graph_visible = False
+            self.graph_button.config(text="Show Graph", state="disabled")
+
+        else:
+            self.show_transaction_graph()
+            self.graph_button.config(state="normal")
 
 if __name__ == "__main__":
     # Initialise the DB and start the application
     initialise_database()
     root = tk.Tk()
     app = BudgetApp(root)
+
+    if platform.system() == 'Windows':
+        root.state('zoomed')
+
     root.mainloop()
