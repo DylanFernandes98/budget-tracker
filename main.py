@@ -1,8 +1,13 @@
+# --- Detecting OS ---
 import platform
 
 # --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
+
+# --- Numerical operations ---
+import numpy as np
+import pandas as pd
 
 # --- Date handling ---
 from datetime import datetime, date
@@ -72,20 +77,20 @@ class BudgetApp:
 
         # --- Buttons ---
         clear_button = tk.Button(self.main_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
-        clear_button.grid(row=5, column=0, columnspan=3, pady=10)
+        clear_button.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
 
         delete_button = tk.Button(self.main_frame, text="Delete latest transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
-        delete_button.grid(row=6, column=0, pady=10)
+        delete_button.grid(row=6, column=0, padx=10, pady=10)
 
         delete_all_button = tk.Button(self.main_frame, text="Delete all transactions", command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
-        delete_all_button.grid(row=6, column=1, pady=10)
+        delete_all_button.grid(row=6, column=1, padx=10, pady=10)
 
         submit_button = tk.Button(self.main_frame, text="Add Transaction", command=self.submit_transaction, fg='white', bg='#4CAF50')
-        submit_button.grid(row=6, column=2, pady=10)
+        submit_button.grid(row=6, column=2, padx=10, pady=10)
 
         # Use 'self' to access button later in toggle transaction graph function
         self.graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.toggle_transaction_graph)
-        self.graph_button.grid(row=10, column=2, pady=10)
+        self.graph_button.grid(row=11, column=2, pady=10)
 
         # --- Status and Output Area ---
         self.status_label = tk.Label(self.main_frame, text="", bg=bg_color, fg="green")
@@ -94,12 +99,15 @@ class BudgetApp:
         self.text_output = tk.Text(self.main_frame, height=15, width=60)
         self.text_output.grid(row=8, column=0, columnspan=3, padx=10, pady=10)
 
+        self.month_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
+        self.month_spent.grid(row=9, column=0, columnspan=3, pady=10)
+
         self.amount_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
-        self.amount_spent.grid(row=9, column=0, columnspan=3, pady=10)
+        self.amount_spent.grid(row=10, column=0, columnspan=3, pady=10)
 
         # --- Graph Area ---
         self.graph_frame = tk.Frame(self.main_frame, bg='#D7E3F4')
-        self.graph_frame.grid(row=11, column=0, columnspan=3, pady=10)
+        self.graph_frame.grid(row=12, column=0, columnspan=3, pady=10)
 
     def submit_transaction(self):
         """
@@ -141,7 +149,7 @@ class BudgetApp:
 
     def update_transaction_list(self):
         """
-        Fetches all the transactions and updates the display area and total amount spent.
+        Fetches all the transactions and updates the display area, total amount spent and monthly average spend.
         """
         df = get_all_transactions()
         self.text_output.delete('1.0', tk.END)
@@ -154,6 +162,27 @@ class BudgetApp:
         # Update total amount spent 
         amount = get_total_amount()
         self.amount_spent.config(text="Total amount spent: £{:.2f}".format(amount))
+
+        # Update average monthly spend
+        self.calculate_monthly_avg()
+
+    def calculate_monthly_avg(self):
+        """
+        Calculates and displays the average amount spent per month
+        """
+        df = get_all_transactions()
+        if df.empty:
+            self.month_spent.config(text="Average monthly spend: £0.00")
+            return
+        
+        # Convert 'date' column to datetime format
+        df['date'] = pd.to_datetime(df['date'])
+        df['month'] = df['date'].dt.to_period(freq='M')
+        # Calculate the average monthly spend    
+        monthly_totals = df.groupby('month')['amount'].sum().values
+        avg = np.mean(monthly_totals)
+
+        self.month_spent.config(text="Average monthly spend: £{:.2f}".format(avg))
 
     def clear_form(self, show_status=True):
         """

@@ -1,4 +1,5 @@
 pandas
+numpy
 tk
 tkCalendar
 matplotlib
