@@ -5,3 +5,4 @@ tkCalendar
 matplotlib
 pytest
 flake8
+scikit-learn

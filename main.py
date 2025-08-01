@@ -5,13 +5,16 @@ import platform
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+# --- Date handling ---
+from datetime import datetime, date
+from tkcalendar import DateEntry
+
 # --- Numerical operations ---
 import numpy as np
 import pandas as pd
 
-# --- Date handling ---
-from datetime import datetime, date
-from tkcalendar import DateEntry
+# --- Machine Learning ---
+from sklearn.linear_model import LinearRegression
 
 # --- Database functions ---
 from db import (
@@ -90,7 +93,7 @@ class BudgetApp:
 
         # Use 'self' to access button later in toggle transaction graph function
         self.graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.toggle_transaction_graph)
-        self.graph_button.grid(row=11, column=2, pady=10)
+        self.graph_button.grid(row=12, column=2, pady=10)
 
         # --- Status and Output Area ---
         self.status_label = tk.Label(self.main_frame, text="", bg=bg_color, fg="green")
@@ -105,9 +108,12 @@ class BudgetApp:
         self.amount_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
         self.amount_spent.grid(row=10, column=0, columnspan=3, pady=10)
 
+        self.predict_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
+        self.predict_spent.grid(row=11, column=0, columnspan=3, pady=10)
+
         # --- Graph Area ---
         self.graph_frame = tk.Frame(self.main_frame, bg='#D7E3F4')
-        self.graph_frame.grid(row=12, column=0, columnspan=3, pady=10)
+        self.graph_frame.grid(row=13, column=0, columnspan=3, pady=10)
 
     def submit_transaction(self):
         """
@@ -166,23 +172,49 @@ class BudgetApp:
         # Update average monthly spend
         self.calculate_monthly_avg()
 
+        # Update predicted spend
+        self.predict_next_month_spend()
+
     def calculate_monthly_avg(self):
         """
-        Calculates and displays the average amount spent per month
+        Calculates and displays the average amount spent per month.
         """
-        df = get_all_transactions()
-        if df.empty:
-            self.month_spent.config(text="Average monthly spend: £0.00")
+        monthly = self._get_monthly_totals()
+
+        if monthly is None or monthly.empty:
+            self.month_spent.config(text="Average monthly spend = £0.00")
             return
         
-        # Convert 'date' column to datetime format
-        df['date'] = pd.to_datetime(df['date'])
-        df['month'] = df['date'].dt.to_period(freq='M')
         # Calculate the average monthly spend    
-        monthly_totals = df.groupby('month')['amount'].sum().values
-        avg = np.mean(monthly_totals)
-
+        avg = np.mean(monthly['amount'].values)
         self.month_spent.config(text="Average monthly spend: £{:.2f}".format(avg))
+
+    def predict_next_month_spend(self):
+        """
+        Predicts the next month's spending using linear regression based on historical monthly totals.
+        """
+        monthly = self._get_monthly_totals()
+
+        if monthly is None or len(monthly) < 2:
+            self.predict_spent.config(text="Predicted Spend: Need at least 2 months of data")
+            return
+        
+        # Creates a numeric sequence for months: 0, 1, 2 etc
+        monthly['month_num'] = range(len(monthly))
+
+        # Takes the input (month) and output (amount)
+        X = monthly[['month_num']]
+        y = monthly['amount']
+        
+        # Initalise a simple linear regression model
+        model = LinearRegression()
+        model.fit(X, y)
+
+        # Predict for the next month
+        next_month = pd.DataFrame([[len(monthly)]], columns=['month_num']) # E.g. if we have 5 months, predict month 5 (zero-indexed)
+        prediction = model.predict(next_month)[0] # Get the predicted value from the result array
+
+        self.predict_spent.config(text="Predicted Spend: £{:.2f}".format(prediction))
 
     def clear_form(self, show_status=True):
         """
@@ -301,6 +333,23 @@ class BudgetApp:
         else:
             self.show_transaction_graph()
             self.graph_button.config(state="normal")
+
+    def _get_monthly_totals(self):
+        """
+        Returns a DataFrame with monthly total spend.
+        Returns None if there's no data.
+        """
+
+        df = get_all_transactions()
+        if df.empty:
+            return None
+        
+        # Convert 'date' column to datetime format
+        df['date'] = pd.to_datetime(df['date'])
+        df['month'] = df['date'].dt.to_period(freq='M')
+
+        # Group by month and sum amounts, then convert to a clean DataFrame
+        return df.groupby('month')['amount'].sum().reset_index()
 
 if __name__ == "__main__":
     # Initialise the DB and start the application
