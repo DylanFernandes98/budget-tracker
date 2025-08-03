@@ -1,6 +1,6 @@
 # 💰 Budget Tracker App
 
-A simple personal finance tracker built with Python. This desktop app lets you record income and expenses, view transactions, and keep track of your budget in real time. It features a minimal interface built with Tkinter and uses SQLite for data storage, and now includes a dynamic bar chart to visualize spending by category.
+A simple personal finance tracker built with Python. This desktop app lets you record income and expenses, view transactions, and keep track of your budget in real time. It features a minimal interface built with Tkinter, uses SQLite for data storage, and includes both a dynamic bar chart to visualize spending by category and a prediction tool to estimate next month’s spending.
 
 ## 🖼️ Preview
 
@@ -13,6 +13,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - See the current balance update in real time
 - Toggle a bar chart showing total spent per category
 - Chart updates live when transactions are added or deleted
+- Predict next month’s spending using basic linear regression on past data
 - Data is stored locally using SQLite  
 - Built with a clean, minimal GUI using Tkinter  
 
@@ -23,6 +24,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - SQLite - Persistent Local Storage
 - Pandas - Data Handling and Display
 - Matplotlib – Graph Visualisation
+- Scikit-learn – Machine Learning
 
 ## 🚀 How to Run
 
