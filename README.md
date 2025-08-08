@@ -8,12 +8,11 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 ## ✨ Features
 
-- Add income or expense transactions with date, category, amount, and description  
-- View all transactions in a scrollable interface  
-- See the current balance update in real time
-- Toggle a bar chart showing total spent per category
-- Chart updates live when transactions are added or deleted
+- Add transaction expense with date, category, amount, and description  
+- View all transactions in a scrollable interface
 - Predict next month’s spending using basic linear regression on past data
+- See the current balance, monthly average, and next month predicted spend update in real time
+- Chart updates live when transactions are added or deleted
 - Data is stored locally using SQLite  
 - Built with a clean, minimal GUI using Tkinter  
 
