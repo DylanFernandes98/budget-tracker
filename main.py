@@ -22,6 +22,7 @@ from db import (
     delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
     get_total_amount
 )
+
 # --- Graphing (matplotlib inside Tkinter) ---
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -37,9 +38,10 @@ class BudgetApp:
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
 
-        #--- Main centered frame ---
-        self.main_frame = tk.Frame(self.root, bg='#D7E3F4')
-        self.main_frame.pack(pady=20) 
+        # --- GRID: 2 columns across the whole window ---
+        self.root.grid_columnconfigure(0, weight=3)
+        self.root.grid_columnconfigure(1, weight=4)
+        self.root.grid_rowconfigure(0, weight=1)
 
         self.graph_visible = False # Tracks whether graph is currently visible
         
@@ -47,7 +49,6 @@ class BudgetApp:
 
         self.update_transaction_list() # Populate the data
         self.refresh_graph()
-        self.welcome_label.config(text="Welcome to my budget tracker app!", font='bold', pady=20)
 
     def setup(self):
         """
@@ -55,65 +56,103 @@ class BudgetApp:
         """
         bg_color = '#D7E3F4'
 
-        # --- Welcome Label ---
-        self.welcome_label = tk.Label(self.main_frame, text="", bg=bg_color)
-        self.welcome_label.grid(row=0, column=0, columnspan=3, pady=10)
+        # --- Left: FORM ---
+        self.form_frame = tk.LabelFrame(self.root, text="Add Transaction", bg=bg_color, padx=12, pady=8)
+        self.form_frame.grid(row=0, column=0, sticky="nsew", padx=16, pady=16)
 
-        # --- Input Fields ---
-        tk.Label(self.main_frame, text="Date", bg=bg_color).grid(row=1, column=0)
-        self.date_entry = DateEntry(self.main_frame, width=18, date_pattern='dd-mm-yyyy', maxdate=date.today(), state='readonly')
-        self.date_entry.grid(row=1, column=1)
+        # Make form inputs stretch
+        self.form_frame.grid_columnconfigure(0, weight=0)
+        self.form_frame.grid_columnconfigure(1, weight=1)
 
-        tk.Label(self.main_frame, text="Amount", bg=bg_color).grid(row=2, column=0)
-        self.amount_entry = tk.Entry(self.main_frame)
-        self.amount_entry.grid(row=2, column=1)
+        self.welcome_label = tk.Label(
+            self.form_frame,
+            text="Welcome to my budget tracker app!\n\nAdd your transactions below:",
+            bg=bg_color,
+            font=('Segoe UI', 18),
+            justify="left",
+        )
+        self.welcome_label.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0,12))
 
-        tk.Label(self.main_frame, text="Category", bg=bg_color).grid(row=3, column=0)
+        # Input fields
+        tk.Label(self.form_frame, text="Date", bg=bg_color).grid(row=1, column=0, sticky="w", padx=10, pady=4)
+        self.date_entry = DateEntry(self.form_frame, width=18, date_pattern='dd-mm-yyyy',
+                                    maxdate=date.today(), state='readonly')
+        self.date_entry.grid(row=1, column=1, sticky="ew", pady=4)
+
+        tk.Label(self.form_frame, text="Amount", bg=bg_color).grid(row=2, column=0, sticky="w", padx=10, pady=4)
+        self.amount_entry = tk.Entry(self.form_frame)
+        self.amount_entry.grid(row=2, column=1, sticky="ew", pady=4)
+
+        tk.Label(self.form_frame, text="Category", bg=bg_color).grid(row=3, column=0, sticky="w", padx=10, pady=4)
         self.category_var = tk.StringVar()
-        self.category_dropdown = ttk.Combobox(self.main_frame, width=18, textvariable=self.category_var,
-            values=['Food', 'Drinks', 'Entertainment', 'Transport', 'Holidays', 'Other'], state='readonly')
-        self.category_dropdown.grid(row=3, column=1)
+        self.category_dropdown = ttk.Combobox(
+            self.form_frame, width=18, textvariable=self.category_var,
+            values=['Food', 'Drinks', 'Entertainment', 'Transport', 'Holidays', 'Other'], state='readonly'
+        )
+        self.category_dropdown.grid(row=3, column=1, sticky="ew", pady=4)
 
-        tk.Label(self.main_frame, text="Description", bg=bg_color).grid(row=4, column=0)
-        self.description_entry = tk.Entry(self.main_frame)
-        self.description_entry.grid(row=4, column=1)
+        tk.Label(self.form_frame, text="Description", bg=bg_color).grid(row=4, column=0, sticky="w", padx=10, pady=4)
+        self.description_entry = tk.Entry(self.form_frame)
+        self.description_entry.grid(row=4, column=1, sticky="ew", pady=4)
 
-        # --- Buttons ---
-        clear_button = tk.Button(self.main_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
-        clear_button.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
+        self.status_label  = tk.Label(self.form_frame, text="", bg=bg_color, fg="green", font=('bold', 16))
+        self.status_label.grid(row=5, column=1, sticky="ew", pady=4)
 
-        delete_button = tk.Button(self.main_frame, text="Delete latest transaction", command=self.delete_latest_transaction, fg='white', bg='#F08080')
-        delete_button.grid(row=6, column=0, padx=10, pady=10)
+        # Buttons
+        clear_button = tk.Button(self.form_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
+        clear_button.grid(row=6, column=1, sticky="ew", padx=4, pady=(20,5))
 
-        delete_all_button = tk.Button(self.main_frame, text="Delete all transactions", command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
-        delete_all_button.grid(row=6, column=1, padx=10, pady=10)
+        submit_button = tk.Button(self.form_frame, text="Add Transaction", command=self.submit_transaction,
+                                  fg='white', bg='#4CAF50')
+        submit_button.grid(row=7, column=1, sticky="ew", padx=4, pady=(5,50))
 
-        submit_button = tk.Button(self.main_frame, text="Add Transaction", command=self.submit_transaction, fg='white', bg='#4CAF50')
-        submit_button.grid(row=6, column=2, padx=10, pady=10)
+        delete_button = tk.Button(self.form_frame, text="Delete latest transaction",
+                                  command=self.delete_latest_transaction, fg='white', bg='#F08080')
+        delete_button.grid(row=8, column=1, sticky="ew", padx=4, pady=(5))
 
-        # Use 'self' to access button later in toggle transaction graph function
-        self.graph_button = tk.Button(self.main_frame, text="Show Graph", command=self.toggle_transaction_graph)
-        self.graph_button.grid(row=12, column=2, pady=10)
+        delete_all_button = tk.Button(self.form_frame, text="Delete all transactions",
+                                      command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
+        delete_all_button.grid(row=9, column=1, sticky="ew", padx=4, pady=(5))
 
-        # --- Status and Output Area ---
-        self.status_label = tk.Label(self.main_frame, text="", bg=bg_color, fg="green")
-        self.status_label.grid(row=7, column=0, columnspan=3)
+        # --- Right: CONTENT (transactions + stats + graph) ---
+        self.right = tk.Frame(self.root, bg=bg_color)
+        self.right.grid(row=0, column=1, sticky="nsew", padx=(0,16), pady=16)
 
-        self.text_output = tk.Text(self.main_frame, height=15, width=60)
-        self.text_output.grid(row=8, column=0, columnspan=3, padx=10, pady=10)
+        # Make right side stretch
+        self.right.grid_rowconfigure(0, weight=2)  # Transactions list grows more
+        self.right.grid_rowconfigure(1, weight=0)  # Stats fixed height
+        self.right.grid_rowconfigure(2, weight=1)  # Graph grows
+        self.right.grid_columnconfigure(0, weight=1)
 
-        self.month_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
-        self.month_spent.grid(row=9, column=0, columnspan=3, pady=10)
+        # Transactions area
+        tx_box = tk.LabelFrame(self.right, text="Transactions", bg=bg_color, padx=8, pady=8)
+        tx_box.grid(row=0, column=0, sticky="nsew")
+        tx_box.grid_rowconfigure(0, weight=1)
+        tx_box.grid_columnconfigure(0, weight=1)
 
-        self.amount_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
-        self.amount_spent.grid(row=10, column=0, columnspan=3, pady=10)
+        self.text_output = tk.Text(tx_box, height=15, width=60)
+        self.text_output.grid(row=0, column=0, sticky="nsew")
 
-        self.predict_spent = tk.Label(self.main_frame, text="", bg=bg_color, fg="black", font='bold')
-        self.predict_spent.grid(row=11, column=0, columnspan=3, pady=10)
+        # Stats area
+        stats = tk.Frame(self.right, bg=bg_color, padx=8, pady=8)
+        stats.grid(row=1, column=0, sticky="ew", pady=(8,8))
+        stats.grid_columnconfigure(0, weight=1)
+        stats.grid_columnconfigure(1, weight=0)
 
-        # --- Graph Area ---
-        self.graph_frame = tk.Frame(self.main_frame, bg='#D7E3F4')
-        self.graph_frame.grid(row=13, column=0, columnspan=3, pady=10)
+        self.amount_spent  = tk.Label(stats, text="", bg=bg_color, fg="black", font=('bold', 18))
+        self.amount_spent.grid(row=1, column=0, sticky="w")
+
+        self.month_spent   = tk.Label(stats, text="", bg=bg_color, fg="black", font=('bold', 18))
+        self.month_spent.grid(row=2, column=0, sticky="w")
+        
+        self.predict_spent = tk.Label(stats, text="", bg=bg_color, fg="black", font=('bold', 18))
+        self.predict_spent.grid(row=3, column=0, sticky="w")
+
+        # Graph area
+        self.graph_frame = tk.LabelFrame(self.right, text="Data Visualisation", bg=bg_color, padx=8, pady=8)
+        self.graph_frame.grid(row=2, column=0, sticky="nsew")
+        self.graph_frame.grid_rowconfigure(0, weight=1)
+        self.graph_frame.grid_columnconfigure(0, weight=1)
 
     def submit_transaction(self):
         """
@@ -167,7 +206,7 @@ class BudgetApp:
         
         # Update total amount spent 
         amount = get_total_amount()
-        self.amount_spent.config(text="Total amount spent: £{:.2f}".format(amount))
+        self.amount_spent.config(text="Total amount spent = £{:.2f}".format(amount))
 
         # Update average monthly spend
         self.calculate_monthly_avg()
@@ -187,7 +226,7 @@ class BudgetApp:
         
         # Calculate the average monthly spend    
         avg = np.mean(monthly['amount'].values)
-        self.month_spent.config(text="Average monthly spend: £{:.2f}".format(avg))
+        self.month_spent.config(text="Average monthly spend = £{:.2f}".format(avg))
 
     def predict_next_month_spend(self):
         """
@@ -196,7 +235,7 @@ class BudgetApp:
         monthly = self._get_monthly_totals()
 
         if monthly is None or len(monthly) < 2:
-            self.predict_spent.config(text="Predicted Spend: Need at least 2 months of data")
+            self.predict_spent.config(text="Next month's predicted spend = Need at least 2 months of data")
             return
         
         # Creates a numeric sequence for months: 0, 1, 2 etc
@@ -214,7 +253,7 @@ class BudgetApp:
         next_month = pd.DataFrame([[len(monthly)]], columns=['month_num']) # E.g. if we have 5 months, predict month 5 (zero-indexed)
         prediction = model.predict(next_month)[0] # Get the predicted value from the result array
 
-        self.predict_spent.config(text="Predicted Spend: £{:.2f}".format(prediction))
+        self.predict_spent.config(text="Next month's predicted spend = £{:.2f}".format(prediction))
 
     def clear_form(self, show_status=True):
         """
@@ -293,27 +332,10 @@ class BudgetApp:
         # Embed the Matplotlib figure into the Tkinter graph frame
         self.canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
 
         # Ensure the figure is closed to avoid lingering state
         plt.close(fig)
-    
-    def toggle_transaction_graph(self):
-        """
-        Toggles the transaction graph so the user can show or hide it.
-        """
-        # Hide the graph
-        if self.graph_visible:
-            # Destroy old canvas if it exists
-            if hasattr(self, 'canvas') and self.canvas:
-                self.canvas.get_tk_widget().destroy()
-            self.graph_button.config(text="Show Graph")
-            self.graph_visible = False
-        # Show the graph
-        else:
-            self.show_transaction_graph()
-            self.graph_button.config(text="Hide Graph")
-            self.graph_visible = True
 
     def refresh_graph(self):
         """
@@ -321,18 +343,19 @@ class BudgetApp:
         """
         df = get_all_transactions()
 
-        if self.graph_visible:
+        # If there is no data then remove the graph from the GUI
+        if df.empty:
             # Destroy old canvas if it exists
             if hasattr(self, 'canvas') and self.canvas:
                 self.canvas.get_tk_widget().destroy()
-
-        if df.empty:
+                self.canvas = None
+            # Update state to reflect no graph is currently visible
             self.graph_visible = False
-            self.graph_button.config(text="Show Graph", state="disabled")
-
-        else:
-            self.show_transaction_graph()
-            self.graph_button.config(state="normal")
+            return
+        
+        # If there is data then draw the graph in the GUI
+        self.show_transaction_graph()
+        self.graph_visible = True
 
     def _get_monthly_totals(self):
         """
