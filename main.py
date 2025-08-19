@@ -42,13 +42,10 @@ class BudgetApp:
         self.root.grid_columnconfigure(0, weight=3)
         self.root.grid_columnconfigure(1, weight=4)
         self.root.grid_rowconfigure(0, weight=1)
-
-        self.graph_visible = False # Tracks whether graph is currently visible
         
         self.setup() # Initialise the GUI layout
-
         self.update_transaction_list() # Populate the data
-        self.refresh_graph()
+        self.refresh_graph() # Open the graph (if there is one)
 
     def setup(self):
         """
@@ -56,17 +53,18 @@ class BudgetApp:
         """
         bg_color = '#D7E3F4'
 
-        # --- Left: FORM ---
+        # --- Left: Add Transaction Form ---
         self.form_frame = tk.LabelFrame(self.root, text="Add Transaction", bg=bg_color, padx=12, pady=8)
         self.form_frame.grid(row=0, column=0, sticky="nsew", padx=16, pady=16)
 
-        # Make form inputs stretch
+        # Make left side stretch (1 column for text fields and 1 column for entry fields and buttons)
         self.form_frame.grid_columnconfigure(0, weight=0)
         self.form_frame.grid_columnconfigure(1, weight=1)
 
+        # Welcome label
         self.welcome_label = tk.Label(
-            self.form_frame,
-            text="Welcome to my budget tracker app!\n\nAdd your transactions below:",
+            self.form_frame, 
+            text="Welcome to my budget tracker app!\n\nAdd your transactions below:", 
             bg=bg_color,
             font=('Segoe UI', 18),
             justify="left",
@@ -95,6 +93,7 @@ class BudgetApp:
         self.description_entry = tk.Entry(self.form_frame)
         self.description_entry.grid(row=4, column=1, sticky="ew", pady=4)
 
+        # Status label
         self.status_label  = tk.Label(self.form_frame, text="", bg=bg_color, fg="green", font=('bold', 16))
         self.status_label.grid(row=5, column=1, sticky="ew", pady=4)
 
@@ -114,7 +113,7 @@ class BudgetApp:
                                       command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
         delete_all_button.grid(row=9, column=1, sticky="ew", padx=4, pady=(5))
 
-        # --- Right: CONTENT (transactions + stats + graph) ---
+        # --- Right: Transactions and Data Visualisation form ---
         self.right = tk.Frame(self.root, bg=bg_color)
         self.right.grid(row=0, column=1, sticky="nsew", padx=(0,16), pady=16)
 
@@ -163,8 +162,8 @@ class BudgetApp:
         category = self.category_var.get()
         description = self.description_entry.get()
 
-        # Ensure all fields are filled
-        if not all([date, amount, category, description]):
+        # Ensure all fields are filled (except description)
+        if not all([date, amount, category]):
             self.status_label.config(text="All fields must be filled in.", fg="red")
             return
 
@@ -368,7 +367,7 @@ class BudgetApp:
             return None
         
         # Convert 'date' column to datetime format
-        df['date'] = pd.to_datetime(df['date'])
+        df['date'] = pd.to_datetime(df['date'], dayfirst=True)
         df['month'] = df['date'].dt.to_period(freq='M')
 
         # Group by month and sum amounts, then convert to a clean DataFrame
