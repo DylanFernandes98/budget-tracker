@@ -26,6 +26,14 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Matplotlib – Graph Visualisation
 - Scikit-learn – Machine Learning
 
+## 📚 Learning Outcomes
+
+- Built a complete desktop app using Python, Tkinter, and SQLite  
+- Used Pandas and Matplotlib to process and visualise financial data  
+- Implemented linear regression with Scikit-learn to predict future spend  
+- Improved modular design, code readability, and GitHub version control
+- Designed a user-friendly interface with real-time updates and interactive charts  
+
 ## 🚀 How to Run
 
 1. **Clone the repository**
