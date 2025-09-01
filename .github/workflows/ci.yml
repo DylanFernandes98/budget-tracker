@@ -32,4 +32,4 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: |
-          pytest
+          python -m pytest -v
