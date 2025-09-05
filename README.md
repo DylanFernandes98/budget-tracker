@@ -70,4 +70,4 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
    Tests are located in the `tests/` directory. Pytest will automatically discover and run them:  
    ```bash
-   pytest
+   python -m pytest
