@@ -45,8 +45,16 @@ A simple personal finance tracker built with Python. This desktop app lets you r
    git clone https://github.com/DylanFernandes98/budget-tracker.git
    cd budget-tracker
 2. **Create and activate a virtual environment**
-
-2. **Run the application**
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\activate
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   pip install -r requirements.txt -r requirements-dev.txt
+4. **Run the application**
    ```bash
    python main.py
-
+5. **Run tests**  
+   ```bash
+   pytest
