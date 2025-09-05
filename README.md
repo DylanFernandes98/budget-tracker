@@ -13,28 +13,31 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Predict next month’s spending using basic linear regression on past data
 - See the current balance, monthly average, and next month predicted spend update in real time
 - Chart updates live when transactions are added or deleted
-- Data is stored locally using SQLite  
-- Built with a clean, minimal GUI using Tkinter
+- Data is stored locally using `SQLite`  
+- Built with a clean, minimal GUI using `Tkinter`
 - Includes basic unit tests (Pytest) and CI workflow (GitHub Actions) for automated testing and linting
 
 ## 🛠 Tech Stack
 
 - Python 3  
-- Tkinter - User Interface  
-- SQLite - Persistent Local Storage
-- Pandas - Data Handling and Display
-- NumPy - Numerical Operations
-- Matplotlib – Graph Visualisation
-- Scikit-learn – Machine Learning
-- Pytest – Unit Testing  
-- GitHub Actions – Continuous Integration
+- `Tkinter` - User Interface  
+- `SQLite` - Persistent Local Storage
+- `Pandas` - Data Handling and Display
+- `NumPy` - Numerical Operations
+- `Matplotlib` – Graph Visualisation
+- `Scikit-learn` – Machine Learning
 
+## 🧪 Testing & CI
+
+- Pytest – Unit Testing  
+- Flake8 – Linting and Style Checks  
+- GitHub Actions – Continuous Integration (CI)  
 
 ## 📚 Learning Outcomes
 
-- Built a complete desktop app using Python, Tkinter, and SQLite  
-- Used Pandas and Matplotlib to process and visualise financial data  
-- Implemented linear regression with Scikit-learn to predict future spend  
+- Built a complete desktop app using Python, `Tkinter`, and `SQLite`  
+- Used `Pandas` and `Matplotlib` to process and visualise financial data  
+- Implemented linear regression with `Scikit-learn` to predict future spend  
 - Practiced modular design, code readability, and GitHub-based version control with CI/testing
 - Designed a user-friendly interface with real-time updates and interactive charts  
 
