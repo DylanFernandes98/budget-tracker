@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/DylanFernandes98/budget-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/DylanFernandes98/budget-tracker/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/dylanfernandes98/budget-tracker/branch/main/graph/badge.svg)](https://codecov.io/gh/dylanfernandes98/budget-tracker)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg)
 
 A simple personal finance tracker built with Python. This desktop app lets you record income and expenses, view transactions, and keep track of your budget in real time. It features a minimal interface built with Tkinter, uses SQLite for data storage, and includes both a dynamic bar chart to visualize spending by category and a prediction tool to estimate next month’s spending.
 
