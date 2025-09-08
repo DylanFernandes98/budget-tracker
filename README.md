@@ -67,7 +67,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
    pip install -r requirements.txt -r requirements-dev.txt
 4. **Run the application**
    ```bash
-   python main.py
+   python -m budget.main
 5. **Run tests**
 
    Tests are located in the `tests/` directory. Pytest will automatically discover and run them:  
