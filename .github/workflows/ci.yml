@@ -36,4 +36,4 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: |
-          python -m pytest -v
+          python -m pytest --cov=budget --cov-report=term-missing -v

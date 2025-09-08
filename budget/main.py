@@ -17,7 +17,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 # --- Database functions ---
-from db import (
+from .db import (
     initialise_database, add_transaction, get_all_transactions,
     delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
     get_total_amount

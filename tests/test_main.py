@@ -1,7 +1,7 @@
 import pytest
 import tkinter as tk
 from unittest.mock import patch
-from main import BudgetApp
+from budget.main import BudgetApp
 
 # Fixture for setting up the Tkinter app
 @pytest.fixture
@@ -21,7 +21,7 @@ def test_submit_transaction_valid(app):
     app.description_entry.insert(0, "Groceries")
 
     # Mock add_transaction so it doesn't write to the real DB
-    with patch("main.add_transaction") as mock_add_transaction:
+    with patch("budget.main.add_transaction") as mock_add_transaction:
         app.submit_transaction()
 
         # Check that add_transaction was called once with correct args
@@ -36,7 +36,7 @@ def test_submit_transaction_invalid_amount(app):
     app.description_entry.insert(0, "Groceries")
 
     # Mock add_transaction so it doesn't write to the real DB
-    with patch("main.add_transaction") as mock_add_transaction:
+    with patch("budget.main.add_transaction") as mock_add_transaction:
         app.submit_transaction()
 
     # Check that the add transaction was NOT called
