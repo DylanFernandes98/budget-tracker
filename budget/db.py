@@ -2,11 +2,14 @@
 import sqlite3
 import pandas as pd
 
+# Set the database name
+DB_NAME = "budget.db"
+
 def initialise_database():
     """
     Creates the SQLite database and a 'transactions' table if it doesn't already exist.
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS transactions (
@@ -22,7 +25,7 @@ def add_transaction(date, amount, category, description):
     """
     Inserts a new transaction record into the database.
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO transactions (date, amount, category, description)
@@ -35,7 +38,7 @@ def get_all_transactions():
     Retrieves all transactions from the database as a pandas DataFrame.
     Returns the dataframe with all transaction records, ordered by date descending.
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         return pd.read_sql('SELECT * FROM transactions ORDER BY date DESC', conn)
 
 def delete_latest_transaction():
@@ -43,7 +46,7 @@ def delete_latest_transaction():
     Deletes the most recently added transaction from the database.
     Returns int or None (ID of the deleted transaction or None if there are no records).
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT MAX(id) FROM transactions")
         result = cursor.fetchone()
@@ -58,7 +61,7 @@ def delete_all_transactions():
     """
     Deletes all transaction records from the database.
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM transactions")
         conn.commit()
@@ -68,7 +71,7 @@ def get_total_amount():
     Calculates the total sum of all transaction amounts.
     Returns float or None (Total amount spent or 0.0 if no records exist.)
     """
-    with sqlite3.connect('budget.db') as conn:
+    with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT SUM(amount) FROM transactions")
         result = cursor.fetchone()
