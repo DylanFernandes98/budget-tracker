@@ -2,10 +2,18 @@ import pytest
 import tkinter as tk
 from unittest.mock import patch
 from budget.ui import BudgetApp
+from budget import db
 
 # Fixture for setting up the Tkinter app
 @pytest.fixture
-def app():
+def app(tmp_path, monkeypatch):
+    # Use a temporary DB instead of the real one
+    test_db = tmp_path / "test_budget.db"
+    monkeypatch.setattr(db, "DB_NAME", str(test_db))
+
+    # Initialise the DB schema
+    db.initialise_database()
+
     root = tk.Tk() # Creates the Tkinter window
     root.withdraw() # Hide GUI window
     app = BudgetApp(root) #Create app with that window
