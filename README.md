@@ -19,7 +19,8 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Chart updates live when transactions are added or deleted
 - Data is stored locally using `SQLite`  
 - Built with a clean, minimal GUI using `Tkinter`
-- Includes basic unit tests (Pytest) and CI workflow (GitHub Actions) for automated testing and linting
+- Includes unit tests (Pytest) and test coverage tracking (Codecov)
+- Automated testing, linting, and coverage reporting via GitHub Actions CI
 
 ## 🛠 Tech Stack
 
@@ -35,15 +36,18 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 - Pytest – Unit Testing  
 - Flake8 – Linting and Style Checks  
-- GitHub Actions – Continuous Integration (CI)  
+- GitHub Actions – Continuous Integration (CI)
+- Codecov - Test Coverage Reports  
 
 ## 📚 Learning Outcomes
 
 - Built a complete desktop app using Python, `Tkinter`, and `SQLite`  
 - Used `Pandas` and `Matplotlib` to process and visualise financial data  
-- Implemented linear regression with `Scikit-learn` to predict future spend  
-- Practiced modular design, code readability, and GitHub-based version control with CI/testing
-- Designed a user-friendly interface with real-time updates and interactive charts  
+- Implemented linear regression with `Scikit-learn` to predict future spend
+- Designed a user-friendly interface with real-time updates and interactive charts
+- Packaged the app as a Python module with a clean `budget/` and `tests/` structure
+- Created and managed a virtual environment with separate dependencies
+- Applied unit testing with Pytest, added coverage reporting, and integrated CI with GitHub Actions   
 
 ## 🚀 How to Run
 
