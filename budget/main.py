@@ -1,3 +1,11 @@
+"""
+Main entrypoint for the Budget Tracker application.
+
+- Initialises the database
+- Starts the Tkinter GUI
+- Maximises the window on Windows systems
+"""
+
 import platform
 import tkinter as tk
 

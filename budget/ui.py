@@ -1,3 +1,10 @@
+"""
+UI module for the Budget Tracker application.
+
+Contains the BudgetApp class, which manages all Tkinter widgets, user input,
+database interaction, and embedded Matplotlib graphs.
+"""
+
 # --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -24,12 +31,15 @@ from .db import (
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+# --- Type hints (Optional[int] = int or None)
+from typing import Optional
+
 class BudgetApp:
     """
     A Tkinter-based GUI application to track expenses.
     Allows adding, displaying and deleting financial transactions with basic validation.
     """    
-    def __init__(self, root):
+    def __init__(self, root) -> None:
         self.root = root
         self.root.option_add('*Font', ('Segoe UI', 14))
         self.root.configure(bg='#D7E3F4')
@@ -150,7 +160,7 @@ class BudgetApp:
         self.graph_frame.grid_rowconfigure(0, weight=1)
         self.graph_frame.grid_columnconfigure(0, weight=1)
 
-    def submit_transaction(self):
+    def submit_transaction(self) -> None:
         """
         Validates user input, then saves the transaction to the database and updates the GUI.
         """
@@ -188,7 +198,7 @@ class BudgetApp:
         # Call the function to refresh the graph
         self.refresh_graph()
 
-    def update_transaction_list(self):
+    def update_transaction_list(self) -> None:
         """
         Fetches all the transactions and updates the display area, total amount spent and monthly average spend.
         """
@@ -210,7 +220,7 @@ class BudgetApp:
         # Update predicted spend
         self.predict_next_month_spend()
 
-    def calculate_monthly_avg(self):
+    def calculate_monthly_avg(self) -> None:
         """
         Calculates and displays the average amount spent per month.
         """
@@ -224,7 +234,7 @@ class BudgetApp:
         avg = np.mean(monthly['amount'].values)
         self.month_spent.config(text="Average monthly spend = £{:.2f}".format(avg))
 
-    def predict_next_month_spend(self):
+    def predict_next_month_spend(self) -> None:
         """
         Predicts the next month's spending using linear regression based on historical monthly totals.
         """
@@ -251,7 +261,7 @@ class BudgetApp:
 
         self.predict_spent.config(text="Next month's predicted spend = £{:.2f}".format(prediction))
 
-    def clear_form(self, show_status=True):
+    def clear_form(self, show_status=True) -> None:
         """
         Clears the form.
         """
@@ -266,7 +276,7 @@ class BudgetApp:
             if show_status:
                 self.status_label.config(text="All fields are clear.", fg="green")
 
-    def delete_latest_transaction(self):
+    def delete_latest_transaction(self) -> None:
         """
         Deletes the most recently added transaction (if there is one).
         """
@@ -280,7 +290,7 @@ class BudgetApp:
         # Call the function to refresh the graph
         self.refresh_graph()
 
-    def delete_all_transactions(self):
+    def delete_all_transactions(self) -> None:
         """
         Deletes all the transactions (if there is any).
         """
@@ -295,7 +305,7 @@ class BudgetApp:
         # Call the function to refresh the graph
         self.refresh_graph()
 
-    def show_transaction_graph(self):
+    def show_transaction_graph(self) -> None:
         """
         Displays a bar chart of the total amount spent per category inside the Tkinter window.
         """
@@ -333,7 +343,7 @@ class BudgetApp:
         # Ensure the figure is closed to avoid lingering state
         plt.close(fig)
 
-    def refresh_graph(self):
+    def refresh_graph(self) -> None:
         """
         Updates or removes the graph whether there is data
         """
@@ -353,7 +363,7 @@ class BudgetApp:
         self.show_transaction_graph()
         self.graph_visible = True
 
-    def _get_monthly_totals(self):
+    def _get_monthly_totals(self) -> Optional[pd.DataFrame]:
         """
         Returns a DataFrame with monthly total spend.
         Returns None if there's no data.
