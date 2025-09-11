@@ -12,15 +12,13 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 ## ✨ Features
 
-- Add transaction expense with date, category, amount, and description  
+- Add transactions with date, category, amount, and description  
 - View all transactions in a scrollable interface
-- Predict next month’s spending using basic linear regression on past data
-- See the current balance, monthly average, and next month predicted spend update in real time
-- Chart updates live when transactions are added or deleted
-- Data is stored locally using `SQLite`  
-- Built with a clean, minimal GUI using `Tkinter`
-- Includes unit tests (Pytest) and test coverage tracking (Codecov)
-- Automated testing, linting, and coverage reporting via GitHub Actions CI
+- Predict next month’s spending using basic linear regression
+- Track current balance, monthly average, and predicted spend in real time
+- Visualise spending per category with live-updating charts
+- Store all data locally in `SQLite`  
+- Interact with a clean, minimal `Tkinter` GUI
 
 ## 🛠 Tech Stack
 
@@ -35,7 +33,8 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 ## 🧪 Testing & CI
 
 - Pytest – Unit Testing  
-- Flake8 – Linting and Style Checks  
+- Flake8 – Linting and Style Checks
+- Mypy - Static Type Checking  
 - GitHub Actions – Continuous Integration (CI)
 - Codecov - Test Coverage Reports  
 
@@ -47,7 +46,14 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Designed a user-friendly interface with real-time updates and interactive charts
 - Packaged the app as a Python module with a clean `budget/` and `tests/` structure
 - Created and managed a virtual environment with separate dependencies
-- Applied unit testing with Pytest, added coverage reporting, and integrated CI with GitHub Actions   
+- Added unit testing with Pytest, coverage reporting, static type checking with Mypy, and automated testing with GitHub Actions CI
+
+## 🏗️ Project Architecture
+
+- `budget/db.py` - Database logic (SQLite interactions)  
+- `budget/ui.py` - Tkinter GUI and charts  
+- `budget/main.py` - Application entrypoint  
+- `tests/` - Unit tests 
 
 ## 🚀 How to Run
 
