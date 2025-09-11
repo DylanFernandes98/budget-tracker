@@ -41,6 +41,7 @@ class BudgetApp:
     """    
     def __init__(self, root) -> None:
         self.root = root
+        self.canvas: Optional[FigureCanvasTkAgg] = None # Graph canvas; set to None initially so mypy knows type
         self.root.option_add('*Font', ('Segoe UI', 14))
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
@@ -231,7 +232,7 @@ class BudgetApp:
             return
         
         # Calculate the average monthly spend    
-        avg = np.mean(monthly['amount'].values)
+        avg = monthly['amount'].mean()
         self.month_spent.config(text="Average monthly spend = £{:.2f}".format(avg))
 
     def predict_next_month_spend(self) -> None:

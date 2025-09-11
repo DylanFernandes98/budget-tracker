@@ -1,3 +1,11 @@
+# Testing
 pytest
 pytest-cov
+
+# Linting
 flake8
+
+# Type checking
+mypy
+pandas-stubs
+scikit-learn-stubs
