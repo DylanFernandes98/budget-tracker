@@ -47,6 +47,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Packaged the app as a Python module with a clean `budget/` and `tests/` structure
 - Created and managed a virtual environment with separate dependencies
 - Added unit testing with Pytest, coverage reporting, static type checking with Mypy, and automated testing with GitHub Actions CI
+- Achieved 100% test coverage on database logic and over 70% overall project coverage
 
 ## 🏗️ Project Architecture
 
