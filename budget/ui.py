@@ -8,6 +8,7 @@ database interaction, and embedded Matplotlib graphs.
 # --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
+from tkinter import filedialog
 
 # --- Date handling ---
 from datetime import datetime, date
@@ -106,7 +107,7 @@ class BudgetApp:
         self.status_label.grid(row=5, column=1, sticky="ew", pady=4)
 
         # Buttons
-        clear_button = tk.Button(self.form_frame, text="Clear form", command=self.clear_form, fg='white', bg='#6A8CAF')
+        clear_button = tk.Button(self.form_frame, text="Clear form", command=self.clear_form, fg='white', bg='#A9A9A9')
         clear_button.grid(row=6, column=1, sticky="ew", padx=4, pady=(20,5))
 
         submit_button = tk.Button(self.form_frame, text="Add Transaction", command=self.submit_transaction,
@@ -114,12 +115,16 @@ class BudgetApp:
         submit_button.grid(row=7, column=1, sticky="ew", padx=4, pady=(5,50))
 
         delete_button = tk.Button(self.form_frame, text="Delete latest transaction",
-                                  command=self.delete_latest_transaction, fg='white', bg='#F08080')
+                                  command=self.delete_latest_transaction, fg='white', bg='#CD5C5C')
         delete_button.grid(row=8, column=1, sticky="ew", padx=4, pady=(5))
 
         delete_all_button = tk.Button(self.form_frame, text="Delete all transactions",
                                       command=self.delete_all_transactions, fg='white', bg='#CD5C5C')
-        delete_all_button.grid(row=9, column=1, sticky="ew", padx=4, pady=(5))
+        delete_all_button.grid(row=9, column=1, sticky="ew", padx=4, pady=(5,50))
+
+        export_button = tk.Button(self.form_frame, text="Export to CSV",
+                                      command=self.export_to_csv, fg='white', bg='#3F51B5')
+        export_button.grid(row=10, column=1, sticky="ew", padx=4, pady=(5))
 
         # --- Right: Transactions and Data Visualisation form ---
         self.right = tk.Frame(self.root, bg=bg_color)
@@ -380,3 +385,17 @@ class BudgetApp:
 
         # Group by month and sum amounts, then convert to a clean DataFrame
         return df.groupby('month')['amount'].sum().reset_index()
+    
+    def export_to_csv(self) -> None:
+        df = get_all_transactions()
+        if df.empty:
+            return None
+        
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")],
+            title="Save transactions as CSV"
+        )
+
+        if file_path:
+            df.to_csv(file_path, index=False)

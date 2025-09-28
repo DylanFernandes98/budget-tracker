@@ -7,7 +7,6 @@ Handles all interactions with the SQLite database, including:
 - Calculating total amounts
 """
 
-
 # --- Database and DataFrame modules
 import sqlite3
 import pandas as pd
