@@ -387,15 +387,20 @@ class BudgetApp:
         return df.groupby('month')['amount'].sum().reset_index()
     
     def export_to_csv(self) -> None:
+        """
+        Exports all transactions from the database to a CSV file.
+        """
         df = get_all_transactions()
         if df.empty:
             return None
         
+        # Ask user where to save CSV file
         file_path = filedialog.asksaveasfilename(
             defaultextension=".csv",
             filetypes=[("CSV files", "*.csv")],
             title="Save transactions as CSV"
         )
 
+        # If user provideda file path, export the DataFrame to CSV
         if file_path:
             df.to_csv(file_path, index=False)
