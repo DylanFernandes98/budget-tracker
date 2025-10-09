@@ -47,14 +47,33 @@ class BudgetApp:
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
 
-        # --- GRID: 2 columns across the whole window ---
-        self.root.grid_columnconfigure(0, weight=3)
-        self.root.grid_columnconfigure(1, weight=4)
+        # --- Make the window responsive ---
         self.root.grid_rowconfigure(0, weight=1)
-        
-        self.setup() # Initialise the GUI layout
-        self.update_transaction_list() # Populate the data
-        self.refresh_graph() # Open the graph (if there is one)
+        self.root.grid_columnconfigure(0, weight=1)
+
+        # --- Create notebook (tabbed interface) ---
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.grid(row=0, column=0, sticky='nsew')
+
+        # --- Style the tab labels ---
+        style = ttk.Style()
+        style.configure('TNotebook.Tab', font=('Segoe UI', 14))
+
+        # --- Create individual tabs ---
+        self.transactions_tab = tk.Frame(self.notebook, bg='#D7E3F4')
+        self.insights_tab = tk.Frame(self.notebook, bg='#D7E3F4')
+
+        # --- Add tabs to the notebook ---
+        self.notebook.add(self.transactions_tab, text=" Transactions ")
+        self.notebook.add(self.insights_tab, text=" Insights ")
+
+        # --- Build tab contents ---
+        self.setup()
+        self.setup_insights_tab()
+
+        # --- Populate initial data for Transactions tab
+        self.update_transaction_list()
+        self.refresh_graph()
 
     def setup(self):
         """
@@ -63,7 +82,7 @@ class BudgetApp:
         bg_color = '#D7E3F4'
 
         # --- Left: Add Transaction Form ---
-        self.form_frame = tk.LabelFrame(self.root, text="Add Transaction", bg=bg_color, padx=12, pady=8)
+        self.form_frame = tk.LabelFrame(self.transactions_tab, text="Add Transaction", bg=bg_color, padx=12, pady=8)
         self.form_frame.grid(row=0, column=0, sticky="nsew", padx=16, pady=16)
 
         # Make left side stretch (1 column for text fields and 1 column for entry fields and buttons)
@@ -127,7 +146,7 @@ class BudgetApp:
         export_button.grid(row=10, column=1, sticky="ew", padx=4, pady=(5))
 
         # --- Right: Transactions and Data Visualisation form ---
-        self.right = tk.Frame(self.root, bg=bg_color)
+        self.right = tk.Frame(self.transactions_tab, bg=bg_color)
         self.right.grid(row=0, column=1, sticky="nsew", padx=(0,16), pady=16)
 
         # Make right side stretch
@@ -165,6 +184,9 @@ class BudgetApp:
         self.graph_frame.grid(row=2, column=0, sticky="nsew")
         self.graph_frame.grid_rowconfigure(0, weight=1)
         self.graph_frame.grid_columnconfigure(0, weight=1)
+
+    def setup_insights_tab(self) -> None:
+        pass
 
     def submit_transaction(self) -> None:
         """
