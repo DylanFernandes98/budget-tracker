@@ -26,7 +26,6 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - `Tkinter` - User Interface  
 - `SQLite` - Persistent Local Storage
 - `Pandas` - Data Handling and Display
-- `NumPy` - Numerical Operations
 - `Matplotlib` – Graph Visualisation
 - `Scikit-learn` – Machine Learning
 
