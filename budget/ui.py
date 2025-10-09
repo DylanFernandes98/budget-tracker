@@ -15,7 +15,6 @@ from datetime import datetime, date
 from tkcalendar import DateEntry
 
 # --- Numerical operations ---
-import numpy as np
 import pandas as pd
 
 # --- Machine Learning ---
