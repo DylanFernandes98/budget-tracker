@@ -67,18 +67,24 @@ class BudgetApp:
         self.notebook.add(self.insights_tab, text=" Insights ")
 
         # --- Build tab contents ---
-        self.setup()
+        self.setup_transactions_tab()
         self.setup_insights_tab()
 
         # --- Populate initial data for Transactions tab
         self.update_transaction_list()
         self.refresh_graph()
 
-    def setup(self):
+    def setup_transactions_tab(self):
         """
-        Sets up all GUI widgets (input fields, buttons, labels and text area)
+        Sets up the Transactions tab layout.
+        This includes all input fields, buttons, labels, and transactions display area
         """
         bg_color = '#D7E3F4'
+
+        # --- Allow the Transactions tab to expand when window is resized ---
+        self.transactions_tab.grid_rowconfigure(0, weight=1)
+        self.transactions_tab.grid_columnconfigure(0, weight=3)
+        self.transactions_tab.grid_columnconfigure(1, weight=4)
 
         # --- Left: Add Transaction Form ---
         self.form_frame = tk.LabelFrame(self.transactions_tab, text="Add Transaction", bg=bg_color, padx=12, pady=8)
@@ -185,7 +191,51 @@ class BudgetApp:
         self.graph_frame.grid_columnconfigure(0, weight=1)
 
     def setup_insights_tab(self) -> None:
-        pass
+        """
+        Sets up the analytics/insights tab layout
+        """
+        bg_color = '#D7E3F4'
+
+        # --- Main container for everything on the Insights tab ---
+        frame = tk.Frame(self.insights_tab, bg=bg_color)
+        frame.pack(fill="both", expand=True, padx=16, pady=16)
+
+        # --- Title ---
+        title = tk.Label(
+            frame,
+            text="Monthly Insights",
+            bg=bg_color,
+            font=('Segoe UI', 20, 'bold')
+        )
+        title.pack(pady=(0, 20))
+
+        # --- KPI Row (Top) ---
+        self.kpi_frame = tk.Frame(frame, bg=bg_color)
+        self.kpi_frame.pack(fill="x", pady=10)
+
+        self.total_label = tk.Label(self.kpi_frame, text="Total spent: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
+        self.total_label.grid(row=0, column=0, padx=20)
+        
+        self.avg_label = tk.Label(self.kpi_frame, text="Avg monthly: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
+        self.avg_label.grid(row=0, column=1, padx=20)
+        
+        self.pred_label = tk.Label(self.kpi_frame, text="Predicted next month: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
+        self.pred_label.grid(row=0, column=2, padx=20)
+
+        # --- Chart Area Placeholder ---
+        self.chart_frame = tk.LabelFrame(frame, text="Spending Overview", bg=bg_color, padx=8, pady=8)
+        self.chart_frame.pack(fill="both", expand=True, pady=10)
+
+        placeholder_chart = tk.Label(self.chart_frame, text="(Charts will appear here)", bg=bg_color, font=('Segoe UI', 13, 'italic'))
+        placeholder_chart.pack(expand=True)
+
+        # --- Insights Text Section ---
+        self.text_frame = tk.LabelFrame(frame, text="Insights", bg=bg_color, padx=12, pady=8)
+        self.text_frame.pack(fill="x", pady=(10, 0))
+
+        self.insight_text = tk.Label(self.text_frame, text="No insights yet.", bg=bg_color, font=('Segoe UI', 14))
+        self.insight_text.pack(anchor="w")
+
 
     def submit_transaction(self) -> None:
         """
