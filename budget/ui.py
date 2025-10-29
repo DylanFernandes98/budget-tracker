@@ -73,6 +73,7 @@ class BudgetApp:
         # --- Populate initial data for Transactions tab
         self.update_transaction_list()
         self.refresh_graph()
+        self.refresh_insights()
 
     def setup_transactions_tab(self):
         """
@@ -236,6 +237,15 @@ class BudgetApp:
         self.insight_text = tk.Label(self.text_frame, text="No insights yet.", bg=bg_color, font=('Segoe UI', 14))
         self.insight_text.pack(anchor="w")
 
+    def refresh_insights(self) -> None:
+        """
+        Syncs KPI text from Transactions tab to the Insights tab.
+        """
+        self.update_transaction_list()
+        self.total_label.config(text=self.amount_spent.cget("text"))
+        self.avg_label.config(text=self.month_spent.cget("text"))
+        self.pred_label.config(text=self.predict_spent.cget("text"))
+        self.insight_text.config(text="Insights updated.")
 
     def submit_transaction(self) -> None:
         """
@@ -274,6 +284,9 @@ class BudgetApp:
 
         # Call the function to refresh the graph
         self.refresh_graph()
+
+        # Update insights tab
+        self.refresh_insights()
 
     def update_transaction_list(self) -> None:
         """
@@ -367,6 +380,9 @@ class BudgetApp:
         # Call the function to refresh the graph
         self.refresh_graph()
 
+        # Update insights tab
+        self.refresh_insights()
+
     def delete_all_transactions(self) -> None:
         """
         Deletes all the transactions (if there is any).
@@ -381,6 +397,9 @@ class BudgetApp:
 
         # Call the function to refresh the graph
         self.refresh_graph()
+
+        # Update insights tab
+        self.refresh_insights()
 
     def show_transaction_graph(self) -> None:
         """
