@@ -223,12 +223,9 @@ class BudgetApp:
         self.pred_label = tk.Label(self.kpi_frame, text="Predicted next month: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
         self.pred_label.grid(row=0, column=2, padx=20)
 
-        # --- Chart Area Placeholder ---
+        # --- Chart Area ---
         self.chart_frame = tk.LabelFrame(frame, text="Spending Overview", bg=bg_color, padx=8, pady=8)
         self.chart_frame.pack(fill="both", expand=True, pady=10)
-
-        placeholder_chart = tk.Label(self.chart_frame, text="(Charts will appear here)", bg=bg_color, font=('Segoe UI', 13, 'italic'))
-        placeholder_chart.pack(expand=True)
 
         # --- Insights Text Section ---
         self.text_frame = tk.LabelFrame(frame, text="Insights", bg=bg_color, padx=12, pady=8)
@@ -246,6 +243,40 @@ class BudgetApp:
         self.avg_label.config(text=self.month_spent.cget("text"))
         self.pred_label.config(text=self.predict_spent.cget("text"))
         self.insight_text.config(text="Insights updated.")
+
+        self.show_monthly_trend()
+
+    def show_monthly_trend(self) -> None:
+        """
+        Displays a line chart of total amount spent per month in the Insights tab
+        """
+        monthly = self._get_monthly_totals()
+        if monthly is None or monthly.empty:
+            return
+        
+        # Destroy old canvas if it exists
+        if hasattr(self, 'trend_canvas') and self.trend_canvas:
+            self.trend_canvas.get_tk_widget().destroy()
+
+        # Convert month period to string for plotting
+        monthly['month'] = monthly['month'].astype(str)
+
+        # Create the figure
+        fig, ax = plt.subplots(figsize=(4.9, 2))
+        ax.plot(monthly['month'], monthly['amount'], marker='o', color='#4CAF50', linewidth=2)
+
+        # Set chart title and axis labels
+        ax.set_title('Monthly Spending Trend')
+        ax.set_xlabel('Month')
+        ax.set_ylabel('Total Spent (£)')
+
+        # Embed the Matplotlib figure into the Tkinter chart frame
+        self.trend_canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        self.trend_canvas.draw()
+        self.trend_canvas.get_tk_widget().pack(fill="both", expand=True)
+
+        # Ensure the figure is closed to avoid lingering state
+        plt.close(fig)
 
     def submit_transaction(self) -> None:
         """
