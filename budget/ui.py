@@ -42,6 +42,7 @@ class BudgetApp:
     def __init__(self, root) -> None:
         self.root = root
         self.canvas: Optional[FigureCanvasTkAgg] = None # Graph canvas; set to None initially so mypy knows type
+        self.trend_canvas: Optional[FigureCanvasTkAgg] = None # Trend graph canvas; set to None initially so mypy knows type
         self.root.option_add('*Font', ('Segoe UI', 14))
         self.root.configure(bg='#D7E3F4')
         self.root.title("Budget Tracker")
