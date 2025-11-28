@@ -266,7 +266,7 @@ class BudgetApp:
         # --- Show percentage change vs last month ---
         monthly = self._get_monthly_totals()
 
-        if monthly is not None and len(monthly) < 2:
+        if monthly is None or len(monthly) < 2:
             msg = "Add more transactions to see spending trends."
         else:
             last, prev = monthly["amount"].iloc[-1], monthly["amount"].iloc[-2]
@@ -278,7 +278,7 @@ class BudgetApp:
                 msg = f"Spending decreased by {pct:.0f}% - nice work staying on track!"
             else:
                 msg = "Spending stayed the same as last month."
-           
+
         self.insight_text.config(text=msg)
 
     def show_monthly_trend(self) -> None:
