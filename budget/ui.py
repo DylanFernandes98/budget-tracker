@@ -61,7 +61,7 @@ class BudgetApp:
 
         # --- Create individual tabs ---
         self.transactions_tab = tk.Frame(self.notebook, bg='#D7E3F4')
-        self.insights_tab = tk.Frame(self.notebook, bg='#D7E3F4')
+        self.insights_tab = tk.Frame(self.notebook, bg='#E8F4EA')
 
         # --- Add tabs to the notebook ---
         self.notebook.add(self.transactions_tab, text=" Transactions ")
@@ -196,7 +196,7 @@ class BudgetApp:
         """
         Sets up the analytics/insights tab layout
         """
-        bg_color = '#D7E3F4'
+        bg_color = '#E8F4EA'
 
         # --- Main container for everything on the Insights tab ---
         frame = tk.Frame(self.insights_tab, bg=bg_color)
@@ -224,9 +224,24 @@ class BudgetApp:
         self.pred_label = tk.Label(self.kpi_frame, text="Predicted next month: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
         self.pred_label.grid(row=0, column=2, padx=20)
 
-        # --- Chart Area ---
-        self.chart_frame = tk.LabelFrame(frame, text="Spending Overview", bg=bg_color, padx=8, pady=8)
-        self.chart_frame.pack(fill="both", expand=True, pady=10)
+        # --- Chart Area (side by side layout) ---
+        charts_frame = tk.Frame(frame, bg=bg_color)
+        charts_frame.pack(fill="both", expand=True, pady=10)
+
+        # Trend Chart (left)
+        self.trend_frame = tk.LabelFrame(charts_frame, text="📈 Monthly Spending Trend", bg=bg_color, padx=8, pady=8)
+        self.trend_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
+
+        # Pie Chart (right)
+        self.pie_frame = tk.LabelFrame(charts_frame, text="🥧 Spending by Category", bg=bg_color, padx=8, pady=8)
+        self.pie_frame.pack(side="left", fill="both", expand=True)
+
+        # --- Top Categories (below charts) ---
+        self.top_frame = tk.LabelFrame(frame, text="Top 3 Categories", bg=bg_color, padx=8, pady=8)
+        self.top_frame.pack(fill="x", pady=(0, 10))
+
+        self.top_label = tk.Label(self.top_frame, text="No data yet.", bg=bg_color, font=("Segoe UI", 13))
+        self.top_label.pack(anchor="w")
 
         # --- Insights Text Section ---
         self.text_frame = tk.LabelFrame(frame, text="Insights", bg=bg_color, padx=12, pady=8)
@@ -243,9 +258,28 @@ class BudgetApp:
         self.total_label.config(text=self.amount_spent.cget("text"))
         self.avg_label.config(text=self.month_spent.cget("text"))
         self.pred_label.config(text=self.predict_spent.cget("text"))
-        self.insight_text.config(text="Insights updated.")
-
+        
         self.show_monthly_trend()
+        self.show_category_pie()
+        self.show_top_categories()
+
+        # --- Show percentage change vs last month ---
+        monthly = self._get_monthly_totals()
+
+        if monthly is not None and len(monthly) < 2:
+            msg = "Add more transactions to see spending trends."
+        else:
+            last, prev = monthly["amount"].iloc[-1], monthly["amount"].iloc[-2]
+            change = last - prev
+            pct = abs(change / prev * 100)
+            if change > 0:
+                msg = f"Spending increased by {pct:.0f}% vs last month - try reviewing your big categories."
+            elif change < 0:
+                msg = f"Spending decreased by {pct:.0f}% - nice work staying on track!"
+            else:
+                msg = "Spending stayed the same as last month."
+           
+        self.insight_text.config(text=msg)
 
     def show_monthly_trend(self) -> None:
         """
@@ -262,22 +296,82 @@ class BudgetApp:
         # Convert month period to string for plotting
         monthly['month'] = monthly['month'].astype(str)
 
-        # Create the figure
-        fig, ax = plt.subplots(figsize=(4.9, 2))
-        ax.plot(monthly['month'], monthly['amount'], marker='o', color='#4CAF50', linewidth=2)
+        # Create a larger, cleaner figure
+        fig, ax = plt.subplots(figsize=(6.5, 3.5))
+        ax.plot(
+            monthly['month'], monthly['amount'],
+            marker='o', markersize=8, linewidth=3, color='#2E8B57',
+            markerfacecolor='#4CAF50', markeredgecolor='black'
+        )
 
-        # Set chart title and axis labels
-        ax.set_title('Monthly Spending Trend')
-        ax.set_xlabel('Month')
-        ax.set_ylabel('Total Spent (£)')
+        # --- Add subtle style tweaks ---
+        ax.set_title('Monthly Spending Trend', fontsize=14, fontweight='bold', pad=10)
+        ax.set_xlabel('Month', fontsize=11)
+        ax.set_ylabel('Total Spent (£)', fontsize=11)
+        ax.tick_params(axis='x', rotation=45)
+        ax.grid(True, linestyle='--', alpha=0.4)
+        ax.set_facecolor('#F8FAFC')
+        fig.patch.set_facecolor('#F8FAFC')
+
+        plt.subplots_adjust(left=0.15, right=0.98, top=0.88, bottom=0.28)
 
         # Embed the Matplotlib figure into the Tkinter chart frame
-        self.trend_canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        self.trend_canvas = FigureCanvasTkAgg(fig, master=self.trend_frame)
         self.trend_canvas.draw()
         self.trend_canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Ensure the figure is closed to avoid lingering state
         plt.close(fig)
+
+    def show_category_pie(self):
+        df = get_all_transactions()
+        if df.empty:
+            return
+
+        grouped = df.groupby("category")["amount"].sum()
+        fig, ax = plt.subplots(figsize=(4, 3))
+        ax.pie(grouped, labels=grouped.index, autopct="%1.0f%%", startangle=90, colors=plt.cm.Set3.colors)
+        ax.set_title("Spending by Category", fontsize=12)
+
+        # Embed
+        pie_canvas = FigureCanvasTkAgg(fig, master=self.pie_frame)
+        pie_canvas.draw()
+        pie_canvas.get_tk_widget().pack(fill="both", expand=True)
+        plt.close(fig)
+
+    def show_top_categories(self) -> None:
+        """
+        Displays top 3 categories by total spend in the Insights tab.
+        """
+        df = get_all_transactions()
+        if df.empty:
+            return
+
+        # Calculate top 3 categories
+        grouped = df.groupby("category")["amount"].sum().sort_values(ascending=False).head(3)
+
+        # Build a numbered list of the top 3 categories and their total amounts
+        lines = []
+        for i, (category, amount) in enumerate(grouped.items(), start=1):
+            line = f"{i}. {category}: £{amount:.2f}"
+            lines.append(line)
+
+        top_text = "\n".join(lines)
+
+        # Destroy old label if it exists
+        if hasattr(self, "top_label") and self.top_label:
+            self.top_label.destroy()
+
+        # Create a label that's *properly left-aligned*
+        self.top_label = tk.Label(
+            self.top_frame,
+            text=top_text,
+            bg="#E8F4EA",
+            font=("Segoe UI", 13),
+            justify="left",   # Ensures all lines align left
+            anchor="w"        # Keeps it anchored to the left edge
+        )
+        self.top_label.pack(anchor="w", pady=(6, 0))
 
     def submit_transaction(self) -> None:
         """
