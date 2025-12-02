@@ -1,31 +1,16 @@
-# --- Core GUI modules ---
+# --- Standard library ---
+from typing import Callable, Optional
+
+# --- Tkinter GUI modules ---
 import tkinter as tk
-from tkinter import ttk, messagebox
-from tkinter import filedialog
 
-# --- Date handling ---
-from datetime import date
-from tkcalendar import DateEntry
-
-# --- Numerical operations ---
+# --- Third-party libraries ---
 import pandas as pd
-
-# --- Machine Learning ---
-from sklearn.linear_model import LinearRegression
-
-# --- Database functions ---
-from ..db import (
-    initialise_database, add_transaction, get_all_transactions,
-    delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
-    get_total_amount
-)
-
-# --- Graphing (matplotlib inside Tkinter) ---
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# --- Type hints ---
-from typing import Callable, Optional
+# --- Local database functions ---
+from ..db import get_all_transactions
 
 class InsightsTabMixin:
     """

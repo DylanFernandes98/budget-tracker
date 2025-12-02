@@ -6,9 +6,11 @@ Main entrypoint for the Budget Tracker application.
 - Maximises the window on Windows systems
 """
 
+# --- Standard library ---
 import platform
 import tkinter as tk
 
+# --- Local application modules ---
 from budget.db import initialise_database
 from budget.ui.app import BudgetApp
 

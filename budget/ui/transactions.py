@@ -1,31 +1,27 @@
-# --- Core GUI modules ---
-import tkinter as tk
-from tkinter import ttk, messagebox
-from tkinter import filedialog
-
-# --- Date handling ---
+# --- Standard library ---
 from datetime import date
-from tkcalendar import DateEntry
+from typing import Callable, Optional
 
-# --- Numerical operations ---
+# --- Tkinter GUI modules ---
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+
+# --- Third-party libraries ---
 import pandas as pd
-
-# --- Machine Learning ---
-from sklearn.linear_model import LinearRegression
-
-# --- Database functions ---
-from ..db import (
-    initialise_database, add_transaction, get_all_transactions,
-    delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
-    get_total_amount
-)
-
-# --- Graphing (matplotlib inside Tkinter) ---
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkcalendar import DateEntry
+from sklearn.linear_model import LinearRegression
 
-# --- Type hints ---
-from typing import Callable, Optional
+# --- Local database functions ---
+from ..db import (
+    initialise_database,
+    add_transaction,
+    get_all_transactions,
+    delete_latest_transaction as delete_latest,
+    delete_all_transactions as delete_all,
+    get_total_amount,
+)
 
 class TransactionTabMixin:
     """
@@ -41,7 +37,7 @@ class TransactionTabMixin:
     _get_monthly_totals: Callable  # type: ignore[attr-defined]
     canvas: FigureCanvasTkAgg | None  # type: ignore[assignment]
 
-    def setup_transactions_tab(self):
+    def setup_transactions_tab(self) -> None:
         """
         Sets up the Transactions tab layout.
         This includes all input fields, buttons, labels, and transactions display area
