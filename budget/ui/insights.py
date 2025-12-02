@@ -36,6 +36,16 @@ class InsightsTabMixin:
     - top categories list
     - insight summary messages
     """
+    # --- Attributes coming from BudgetApp (parent class) ---
+    update_transaction_list: callable  # type: ignore[attr-defined]
+    amount_spent: tk.Label  # type: ignore[attr-defined]
+    month_spent: tk.Label  # type: ignore[attr-defined]
+    predict_spent: tk.Label  # type: ignore[attr-defined]
+
+    trend_canvas: FigureCanvasTkAgg | None  # type: ignore[assignment]
+    pie_canvas: FigureCanvasTkAgg | None  # type: ignore[assignment]
+
+    insights_tab: tk.Frame  # type: ignore[attr-defined]
 
     def setup_insights_tab(self) -> None:
         """

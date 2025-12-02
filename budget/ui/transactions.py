@@ -36,6 +36,11 @@ class TransactionTabMixin:
     - calculating KPI values
     - generating the bar chart
     """
+     # --- Attributes provided by BudgetApp but used here ---
+    refresh_insights: callable  # type: ignore[attr-defined]
+    _get_monthly_totals: callable  # type: ignore[attr-defined]
+    canvas: FigureCanvasTkAgg | None  # type: ignore[assignment]
+
     def setup_transactions_tab(self):
         """
         Sets up the Transactions tab layout.
@@ -357,7 +362,7 @@ class TransactionTabMixin:
             # Destroy old canvas if it exists
             if self.canvas:
                 self.canvas.get_tk_widget().destroy()
-                self.canvas = None
+                self.canvas = None  # type: ignore[assignment]
             # Update state to reflect no graph is currently visible
             self.graph_visible = False
             return
