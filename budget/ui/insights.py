@@ -44,7 +44,7 @@ class InsightsTabMixin:
         bg_color = '#E8F4EA'
 
         # --- Main container for everything on the Insights tab ---
-        frame = tk.Frame(self.insights_tab, bg=bg_color)
+        frame = tk.Frame(self.insights_tab, bg=bg_color) # type: ignore[attr-defined]
         frame.pack(fill="both", expand=True, padx=16, pady=16)
 
         # --- Title ---
@@ -99,10 +99,10 @@ class InsightsTabMixin:
         """
         Syncs KPI text from Transactions tab to the Insights tab.
         """
-        self.update_transaction_list()
-        self.total_label.config(text=self.amount_spent.cget("text"))
-        self.avg_label.config(text=self.month_spent.cget("text"))
-        self.pred_label.config(text=self.predict_spent.cget("text"))
+        self.update_transaction_list() # type: ignore[attr-defined]
+        self.total_label.config(text=self.amount_spent.cget("text")) # type: ignore[attr-defined]
+        self.avg_label.config(text=self.month_spent.cget("text")) # type: ignore[attr-defined]
+        self.pred_label.config(text=self.predict_spent.cget("text")) # type: ignore[attr-defined]
         
         # Fetch data once
         df = get_all_transactions()
@@ -184,7 +184,7 @@ class InsightsTabMixin:
         grouped = df.groupby("category")["amount"].sum()
         fig, ax = plt.subplots(figsize=(3.5, 3.5))
 
-        ax.pie(grouped, labels=grouped.index, autopct="%1.0f%%", startangle=90, colors=plt.cm.Set3.colors, labeldistance=1.1)
+        ax.pie(grouped, labels=grouped.index, autopct="%1.0f%%", startangle=90, colors=plt.cm.Set3.colors, labeldistance=1.1) # type: ignore[attr-defined]
         ax.set_title("Spending by Category")
 
         # Embed the Matplotlib figure into the Tkinter chart frame

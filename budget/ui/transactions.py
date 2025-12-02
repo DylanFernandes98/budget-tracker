@@ -44,12 +44,12 @@ class TransactionTabMixin:
         bg_color = '#D7E3F4'
 
         # --- Allow the Transactions tab to expand when window is resized ---
-        self.transactions_tab.grid_rowconfigure(0, weight=1)
-        self.transactions_tab.grid_columnconfigure(0, weight=3)
-        self.transactions_tab.grid_columnconfigure(1, weight=4)
+        self.transactions_tab.grid_rowconfigure(0, weight=1) # type: ignore[attr-defined]
+        self.transactions_tab.grid_columnconfigure(0, weight=3) # type: ignore[attr-defined]
+        self.transactions_tab.grid_columnconfigure(1, weight=4) # type: ignore[attr-defined]
 
         # --- Left: Add Transaction Form ---
-        self.form_frame = tk.LabelFrame(self.transactions_tab, text="Add Transaction", bg=bg_color, padx=12, pady=8)
+        self.form_frame = tk.LabelFrame(self.transactions_tab, text="Add Transaction", bg=bg_color, padx=12, pady=8) # type: ignore[attr-defined]
         self.form_frame.grid(row=0, column=0, sticky="nsew", padx=16, pady=16)
 
         # Make left side stretch (1 column for text fields and 1 column for entry fields and buttons)
@@ -113,7 +113,7 @@ class TransactionTabMixin:
         export_button.grid(row=10, column=1, sticky="ew", padx=4, pady=(5))
 
         # --- Right: Transactions and Data Visualisation form ---
-        self.right = tk.Frame(self.transactions_tab, bg=bg_color)
+        self.right = tk.Frame(self.transactions_tab, bg=bg_color) # type: ignore[attr-defined]
         self.right.grid(row=0, column=1, sticky="nsew", padx=(0,16), pady=16)
 
         # Make right side stretch
@@ -191,7 +191,7 @@ class TransactionTabMixin:
         self.refresh_graph()
 
         # Update insights tab
-        self.refresh_insights()
+        self.refresh_insights() # type: ignore[attr-defined]
 
     def update_transaction_list(self) -> None:
         """
@@ -220,7 +220,7 @@ class TransactionTabMixin:
         Calculates and displays the average amount spent per month.
         """
         df = get_all_transactions()
-        monthly = self._get_monthly_totals(df)
+        monthly = self._get_monthly_totals(df) # type: ignore[attr-defined]
 
         if monthly is None or monthly.empty:
             self.month_spent.config(text="Average monthly spend = £0.00")
@@ -235,7 +235,7 @@ class TransactionTabMixin:
         Predicts the next month's spending using linear regression based on historical monthly totals.
         """
         df = get_all_transactions()
-        monthly = self._get_monthly_totals(df)
+        monthly = self._get_monthly_totals(df) # type: ignore[attr-defined]
 
         if monthly is None or len(monthly) < 2:
             self.predict_spent.config(text="Next month's predicted spend = Need at least 2 months of data")
@@ -288,7 +288,7 @@ class TransactionTabMixin:
         self.refresh_graph()
 
         # Update insights tab
-        self.refresh_insights()
+        self.refresh_insights() # type: ignore[attr-defined]
 
     def delete_all_transactions(self) -> None:
         """
@@ -306,7 +306,7 @@ class TransactionTabMixin:
         self.refresh_graph()
 
         # Update insights tab
-        self.refresh_insights()
+        self.refresh_insights() # type: ignore[attr-defined]
 
     def show_transaction_graph(self) -> None:
         """
