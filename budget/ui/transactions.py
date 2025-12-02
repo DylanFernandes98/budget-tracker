@@ -169,8 +169,8 @@ class TransactionTabMixin:
 
         # Validate amount is a positive number
         try:
-            amount = float(amount)
-            if amount < 0:
+            amount_float = float(amount)
+            if amount_float < 0:
                 self.status_label.config(text="Amount must be a positive number.", fg="red")
                 return
         except ValueError:
@@ -183,7 +183,7 @@ class TransactionTabMixin:
             return
 
         # Add transaction and refresh the GUI
-        add_transaction(date, amount, category, description)
+        add_transaction(date, amount_float, category, description)
         self.status_label.config(text="Transaction added successfully.", fg="green")
         self.clear_form(show_status=False) # Keep the transaction message visible
         self.update_transaction_list()
