@@ -51,10 +51,12 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 ## 🏗️ Project Architecture
 
-- `budget/db.py` - Database logic (SQLite interactions)  
-- `budget/ui.py` - Tkinter GUI and charts  
+- `budget/db.py` - SQLite database logic  
+- `budget/ui/app.py` — Main Tkinter application class  
+- `budget/ui/transactions.py` — Transactions tab logic (add/view/delete + chart)  
+- `budget/ui/insights.py` — Insights tab logic (trend, pie chart, summary)   
 - `budget/main.py` - Application entrypoint  
-- `tests/` - Unit tests 
+- `tests/` - Pytest unit tests 
 
 ## 🚀 How to Run
 
