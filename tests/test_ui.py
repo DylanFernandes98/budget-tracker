@@ -33,7 +33,7 @@ def test_submit_transaction_valid(app):
         app.submit_transaction()
 
         # Check that add_transaction was called once with correct args
-        mock_add_transaction.assert_called_once_with("01-07-2025", 20.50, "Food", "Groceries")
+        mock_add_transaction.assert_called_once_with("2025-07-01", 20.50, "Food", "Groceries")
 
 # Invalid transaction test
 def test_submit_transaction_invalid_amount(app):
