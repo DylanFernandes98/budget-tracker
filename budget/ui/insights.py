@@ -102,6 +102,23 @@ class InsightsTabMixin:
         # Fetch data once
         df = get_all_transactions()
         if df.empty:
+            # Clear trend chart
+            if self.trend_canvas:
+                self.trend_canvas.get_tk_widget().destroy()
+                self.trend_canvas = None
+
+            # Clear pie chart
+            if self.pie_canvas:
+                self.pie_canvas.get_tk_widget().destroy()
+                self.pie_canvas = None
+
+            # Clear top categories
+            if self.top_label:
+                self.top_label.config(text="No data yet.")
+
+            # Clear insights summary
+            self.insight_text.config(text="No insights yet.")
+
             return
         
         monthly = self._get_monthly_totals(df)

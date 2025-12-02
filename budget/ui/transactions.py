@@ -157,7 +157,8 @@ class TransactionTabMixin:
         """
         Validates user input, then saves the transaction to the database and updates the GUI.
         """
-        date = self.date_entry.get()
+        raw_date = self.date_entry.get()
+        date = pd.to_datetime(raw_date, dayfirst=True).strftime("%Y-%m-%d")
         amount = self.amount_entry.get()
         category = self.category_var.get()
         description = self.description_entry.get()
