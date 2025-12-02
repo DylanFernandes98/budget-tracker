@@ -1,17 +1,10 @@
-"""
-UI module for the Budget Tracker application.
-
-Contains the BudgetApp class, which manages all Tkinter widgets, user input,
-database interaction, and embedded Matplotlib graphs.
-"""
-
 # --- Core GUI modules ---
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter import filedialog
 
 # --- Date handling ---
-from datetime import datetime, date
+from datetime import date
 from tkcalendar import DateEntry
 
 # --- Numerical operations ---
@@ -21,7 +14,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 # --- Database functions ---
-from .db import (
+from ..db import (
     initialise_database, add_transaction, get_all_transactions,
     delete_latest_transaction as delete_latest, delete_all_transactions as delete_all,
     get_total_amount
@@ -31,51 +24,18 @@ from .db import (
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# --- Type hints (Optional[int] = int or None)
+# --- Type hints ---
 from typing import Optional
 
-class BudgetApp:
+class TransactionTabMixin:
     """
-    A Tkinter-based GUI application to track expenses.
-    Allows adding, displaying and deleting financial transactions with basic validation.
-    """    
-    def __init__(self, root) -> None:
-        self.root = root
-        self.canvas: Optional[FigureCanvasTkAgg] = None # Graph canvas; set to None initially so mypy knows type
-        self.trend_canvas: Optional[FigureCanvasTkAgg] = None # Trend graph canvas; set to None initially so mypy knows type
-        self.root.option_add('*Font', ('Segoe UI', 14))
-        self.root.configure(bg='#D7E3F4')
-        self.root.title("Budget Tracker")
-
-        # --- Make the window responsive ---
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-
-        # --- Create notebook (tabbed interface) ---
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.grid(row=0, column=0, sticky='nsew')
-
-        # --- Style the tab labels ---
-        style = ttk.Style()
-        style.configure('TNotebook.Tab', font=('Segoe UI', 14))
-
-        # --- Create individual tabs ---
-        self.transactions_tab = tk.Frame(self.notebook, bg='#D7E3F4')
-        self.insights_tab = tk.Frame(self.notebook, bg='#E8F4EA')
-
-        # --- Add tabs to the notebook ---
-        self.notebook.add(self.transactions_tab, text=" Transactions ")
-        self.notebook.add(self.insights_tab, text=" Insights ")
-
-        # --- Build tab contents ---
-        self.setup_transactions_tab()
-        self.setup_insights_tab()
-
-        # --- Populate initial data for Transactions tab
-        self.update_transaction_list()
-        self.refresh_graph()
-        self.refresh_insights()
-
+    Contains all methods related to the Transactions tab:
+    - setup_transactions_tab layout
+    - adding / deleting transactions
+    - refreshing the transactions list
+    - calculating KPI values
+    - generating the bar chart
+    """
     def setup_transactions_tab(self):
         """
         Sets up the Transactions tab layout.
@@ -192,187 +152,6 @@ class BudgetApp:
         self.graph_frame.grid_rowconfigure(0, weight=1)
         self.graph_frame.grid_columnconfigure(0, weight=1)
 
-    def setup_insights_tab(self) -> None:
-        """
-        Sets up the analytics/insights tab layout
-        """
-        bg_color = '#E8F4EA'
-
-        # --- Main container for everything on the Insights tab ---
-        frame = tk.Frame(self.insights_tab, bg=bg_color)
-        frame.pack(fill="both", expand=True, padx=16, pady=16)
-
-        # --- Title ---
-        title = tk.Label(
-            frame,
-            text="Monthly Insights",
-            bg=bg_color,
-            font=('Segoe UI', 20, 'bold')
-        )
-        title.pack(pady=(0, 20))
-
-        # --- KPI Row (Top) ---
-        self.kpi_frame = tk.Frame(frame, bg=bg_color)
-        self.kpi_frame.pack(fill="x", pady=10)
-
-        self.total_label = tk.Label(self.kpi_frame, text="Total spent: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
-        self.total_label.grid(row=0, column=0, padx=20)
-        
-        self.avg_label = tk.Label(self.kpi_frame, text="Avg monthly: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
-        self.avg_label.grid(row=0, column=1, padx=20)
-        
-        self.pred_label = tk.Label(self.kpi_frame, text="Predicted next month: £0.00", bg=bg_color, font=('Segoe UI', 14, 'bold'))
-        self.pred_label.grid(row=0, column=2, padx=20)
-
-        # --- Chart Area (side by side layout) ---
-        charts_frame = tk.Frame(frame, bg=bg_color)
-        charts_frame.pack(fill="both", expand=True, pady=10)
-
-        # Trend Chart (left)
-        self.trend_frame = tk.LabelFrame(charts_frame, text="📈 Monthly Spending Trend", bg=bg_color, padx=8, pady=8)
-        self.trend_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
-
-        # Pie Chart (right)
-        self.pie_frame = tk.LabelFrame(charts_frame, text="🥧 Spending by Category", bg=bg_color, padx=8, pady=8)
-        self.pie_frame.pack(side="left", fill="both", expand=True)
-
-        # --- Top Categories (below charts) ---
-        self.top_frame = tk.LabelFrame(frame, text="Top 3 Categories", bg=bg_color, padx=8, pady=8)
-        self.top_frame.pack(fill="x", pady=(0, 10))
-
-        self.top_label = tk.Label(self.top_frame, text="No data yet.", bg=bg_color, font=("Segoe UI", 13))
-        self.top_label.pack(anchor="w")
-
-        # --- Insights Text Section ---
-        self.text_frame = tk.LabelFrame(frame, text="Insights", bg=bg_color, padx=12, pady=8)
-        self.text_frame.pack(fill="x", pady=(10, 0))
-
-        self.insight_text = tk.Label(self.text_frame, text="No insights yet.", bg=bg_color, font=('Segoe UI', 14))
-        self.insight_text.pack(anchor="w")
-
-    def refresh_insights(self) -> None:
-        """
-        Syncs KPI text from Transactions tab to the Insights tab.
-        """
-        self.update_transaction_list()
-        self.total_label.config(text=self.amount_spent.cget("text"))
-        self.avg_label.config(text=self.month_spent.cget("text"))
-        self.pred_label.config(text=self.predict_spent.cget("text"))
-        
-        self.show_monthly_trend()
-        self.show_category_pie()
-        self.show_top_categories()
-
-        # --- Show percentage change vs last month ---
-        monthly = self._get_monthly_totals()
-
-        if monthly is None or len(monthly) < 2:
-            msg = "Add more transactions to see spending trends."
-        else:
-            last, prev = monthly["amount"].iloc[-1], monthly["amount"].iloc[-2]
-            change = last - prev
-            pct = abs(change / prev * 100)
-            if change > 0:
-                msg = f"Spending increased by {pct:.0f}% vs last month - try reviewing your big categories."
-            elif change < 0:
-                msg = f"Spending decreased by {pct:.0f}% - nice work staying on track!"
-            else:
-                msg = "Spending stayed the same as last month."
-
-        self.insight_text.config(text=msg)
-
-    def show_monthly_trend(self) -> None:
-        """
-        Displays a line chart of total amount spent per month in the Insights tab
-        """
-        monthly = self._get_monthly_totals()
-        if monthly is None or monthly.empty:
-            return
-        
-        # Destroy old canvas if it exists
-        if hasattr(self, 'trend_canvas') and self.trend_canvas:
-            self.trend_canvas.get_tk_widget().destroy()
-
-        # Convert month period to string for plotting
-        monthly['month'] = monthly['month'].astype(str)
-
-        # Create a larger, cleaner figure
-        fig, ax = plt.subplots(figsize=(6.5, 3.5))
-        ax.plot(
-            monthly['month'], monthly['amount'],
-            marker='o', markersize=8, linewidth=3, color='#2E8B57',
-            markerfacecolor='#4CAF50', markeredgecolor='black'
-        )
-
-        # --- Add subtle style tweaks ---
-        ax.set_title('Monthly Spending Trend', fontsize=14, fontweight='bold', pad=10)
-        ax.set_xlabel('Month', fontsize=11)
-        ax.set_ylabel('Total Spent (£)', fontsize=11)
-        ax.tick_params(axis='x', rotation=45)
-        ax.grid(True, linestyle='--', alpha=0.4)
-        ax.set_facecolor('#F8FAFC')
-        fig.patch.set_facecolor('#F8FAFC')
-
-        plt.subplots_adjust(left=0.15, right=0.98, top=0.88, bottom=0.28)
-
-        # Embed the Matplotlib figure into the Tkinter chart frame
-        self.trend_canvas = FigureCanvasTkAgg(fig, master=self.trend_frame)
-        self.trend_canvas.draw()
-        self.trend_canvas.get_tk_widget().pack(fill="both", expand=True)
-
-        # Ensure the figure is closed to avoid lingering state
-        plt.close(fig)
-
-    def show_category_pie(self):
-        df = get_all_transactions()
-        if df.empty:
-            return
-
-        grouped = df.groupby("category")["amount"].sum()
-        fig, ax = plt.subplots(figsize=(4, 3))
-        ax.pie(grouped, labels=grouped.index, autopct="%1.0f%%", startangle=90, colors=plt.cm.Set3.colors)
-        ax.set_title("Spending by Category", fontsize=12)
-
-        # Embed
-        pie_canvas = FigureCanvasTkAgg(fig, master=self.pie_frame)
-        pie_canvas.draw()
-        pie_canvas.get_tk_widget().pack(fill="both", expand=True)
-        plt.close(fig)
-
-    def show_top_categories(self) -> None:
-        """
-        Displays top 3 categories by total spend in the Insights tab.
-        """
-        df = get_all_transactions()
-        if df.empty:
-            return
-
-        # Calculate top 3 categories
-        grouped = df.groupby("category")["amount"].sum().sort_values(ascending=False).head(3)
-
-        # Build a numbered list of the top 3 categories and their total amounts
-        lines = []
-        for i, (category, amount) in enumerate(grouped.items(), start=1):
-            line = f"{i}. {category}: £{amount:.2f}"
-            lines.append(line)
-
-        top_text = "\n".join(lines)
-
-        # Destroy old label if it exists
-        if hasattr(self, "top_label") and self.top_label:
-            self.top_label.destroy()
-
-        # Create a label that's *properly left-aligned*
-        self.top_label = tk.Label(
-            self.top_frame,
-            text=top_text,
-            bg="#E8F4EA",
-            font=("Segoe UI", 13),
-            justify="left",   # Ensures all lines align left
-            anchor="w"        # Keeps it anchored to the left edge
-        )
-        self.top_label.pack(anchor="w", pady=(6, 0))
-
     def submit_transaction(self) -> None:
         """
         Validates user input, then saves the transaction to the database and updates the GUI.
@@ -440,7 +219,8 @@ class BudgetApp:
         """
         Calculates and displays the average amount spent per month.
         """
-        monthly = self._get_monthly_totals()
+        df = get_all_transactions()
+        monthly = self._get_monthly_totals(df)
 
         if monthly is None or monthly.empty:
             self.month_spent.config(text="Average monthly spend = £0.00")
@@ -454,7 +234,8 @@ class BudgetApp:
         """
         Predicts the next month's spending using linear regression based on historical monthly totals.
         """
-        monthly = self._get_monthly_totals()
+        df = get_all_transactions()
+        monthly = self._get_monthly_totals(df)
 
         if monthly is None or len(monthly) < 2:
             self.predict_spent.config(text="Next month's predicted spend = Need at least 2 months of data")
@@ -536,7 +317,7 @@ class BudgetApp:
             return
 
         # Destroy old canvas if it exists
-        if hasattr(self, 'canvas') and self.canvas:
+        if self.canvas:
             self.canvas.get_tk_widget().destroy()
 
         # Group transactions by category, sum their amounts, and sort from lowest to highest
@@ -574,7 +355,7 @@ class BudgetApp:
         # If there is no data then remove the graph from the GUI
         if df.empty:
             # Destroy old canvas if it exists
-            if hasattr(self, 'canvas') and self.canvas:
+            if self.canvas:
                 self.canvas.get_tk_widget().destroy()
                 self.canvas = None
             # Update state to reflect no graph is currently visible
@@ -585,23 +366,6 @@ class BudgetApp:
         self.show_transaction_graph()
         self.graph_visible = True
 
-    def _get_monthly_totals(self) -> Optional[pd.DataFrame]:
-        """
-        Returns a DataFrame with monthly total spend.
-        Returns None if there's no data.
-        """
-
-        df = get_all_transactions()
-        if df.empty:
-            return None
-        
-        # Convert 'date' column to datetime format
-        df['date'] = pd.to_datetime(df['date'], dayfirst=True)
-        df['month'] = df['date'].dt.to_period(freq='M')
-
-        # Group by month and sum amounts, then convert to a clean DataFrame
-        return df.groupby('month')['amount'].sum().reset_index()
-    
     def export_to_csv(self) -> None:
         """
         Exports all transactions from the database to a CSV file.
