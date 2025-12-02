@@ -8,7 +8,11 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 
 ## 🖼️ Preview
 
-![App Screenshot](./screenshot.JPG)
+### Transactions Tab
+![Transactions Screenshot](./screenshot.JPG)
+
+### Insights Tab
+![Insights Screenshot](./insights_screenshot.JPG)
 
 ## ✨ Features
 
@@ -16,7 +20,11 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - View all transactions in a scrollable interface
 - Predict next month’s spending using basic linear regression
 - Track current balance, monthly average, and predicted spend in real time
-- Visualise spending per category with live-updating charts
+- Visualise spending with dynamic charts:
+  - 📊 Category bar chart (Transactions tab)
+  - 📈 Monthly trend line chart (Insights tab)
+  - 🥧 Category pie chart (Insights tab)
+- View month-to-month spending insights
 - Store all data locally in `SQLite`  
 - Interact with a clean, minimal `Tkinter` GUI
 
@@ -43,6 +51,7 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 - Used `Pandas` and `Matplotlib` to process and visualise financial data  
 - Implemented linear regression with `Scikit-learn` to predict future spend
 - Designed a user-friendly interface with real-time updates and interactive charts
+- Built an insights dashboard with monthly trend analysis, pie charts, and auto-generated summaries
 - Packaged the app as a Python module with a clean `budget/` and `tests/` structure
 - Created and managed a virtual environment with separate dependencies
 - Added unit testing with Pytest, coverage reporting, static type checking with Mypy, and automated testing with GitHub Actions CI
