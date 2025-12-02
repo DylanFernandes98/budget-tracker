@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # --- Type hints ---
-from typing import Optional
+from typing import Callable, Optional
 
 class InsightsTabMixin:
     """
@@ -37,7 +37,7 @@ class InsightsTabMixin:
     - insight summary messages
     """
     # --- Attributes coming from BudgetApp (parent class) ---
-    update_transaction_list: callable  # type: ignore[attr-defined]
+    update_transaction_list: Callable  # type: ignore[attr-defined]
     amount_spent: tk.Label  # type: ignore[attr-defined]
     month_spent: tk.Label  # type: ignore[attr-defined]
     predict_spent: tk.Label  # type: ignore[attr-defined]

@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # --- Type hints ---
-from typing import Optional
+from typing import Callable, Optional
 
 class TransactionTabMixin:
     """
@@ -37,8 +37,8 @@ class TransactionTabMixin:
     - generating the bar chart
     """
      # --- Attributes provided by BudgetApp but used here ---
-    refresh_insights: callable  # type: ignore[attr-defined]
-    _get_monthly_totals: callable  # type: ignore[attr-defined]
+    refresh_insights: Callable  # type: ignore[attr-defined]
+    _get_monthly_totals: Callable  # type: ignore[attr-defined]
     canvas: FigureCanvasTkAgg | None  # type: ignore[assignment]
 
     def setup_transactions_tab(self):
