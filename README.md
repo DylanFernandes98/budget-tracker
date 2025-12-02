@@ -9,10 +9,10 @@ A simple personal finance tracker built with Python. This desktop app lets you r
 ## 🖼️ Preview
 
 ### Transactions Tab
-<img src="./screenshot.JPG" width="800">
+<img src="./screenshot.JPG" width="1000">
 
 ### Insights Tab
-<img src="./insights_screenshot.JPG" width="800">
+<img src="./insights_screenshot.JPG" width="1000">
 
 ## ✨ Features
 
