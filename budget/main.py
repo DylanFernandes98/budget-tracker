@@ -14,8 +14,10 @@ import tkinter as tk
 from budget.db import initialise_database
 from budget.ui.app import BudgetApp
 
-if __name__ == "__main__":
-    # Initialise the DB and start the application
+def run_app():
+    """
+    Starts the Budget Tracker GUI.
+    """
     initialise_database()
     root = tk.Tk()
     app = BudgetApp(root)
@@ -24,3 +26,8 @@ if __name__ == "__main__":
         root.state('zoomed')
 
     root.mainloop()
+    return root, app
+
+
+if __name__ == "__main__": # pragma: no cover
+    run_app()
