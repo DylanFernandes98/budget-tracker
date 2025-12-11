@@ -1,18 +1,9 @@
-import pytest
 from budget import db
 
-@pytest.fixture()
-def temp_db(tmp_path, monkeypatch):
-    # Use a temporary DB instead of the real one
-    test_db = tmp_path / "test_budget.db"
-    monkeypatch.setattr(db, "DB_NAME", str(test_db))
-
-    # Create schema
-    db.initialise_database()
-
-    yield db
-
 def test_add_transaction(temp_db):
+    """
+    Adding a transaction should correctly save it to the database.
+    """
     # Add a single transaction into the temporary test database
     temp_db.add_transaction("2025-09-09", 10, "Food", "Lunch")
     
@@ -30,6 +21,9 @@ def test_add_transaction(temp_db):
     assert result.iloc[0]["description"]  == "Lunch"
 
 def test_delete_latest_transaction(temp_db):
+    """
+    delete_latest_transaction should remove only the most recent row.
+    """
     # Add two transactions, so we can test deleting the most recent
     temp_db.add_transaction("2025-09-09", 10, "Food", "Lunch")
     temp_db.add_transaction("2025-09-09", 20, "Drinks", "Bar")
@@ -48,10 +42,16 @@ def test_delete_latest_transaction(temp_db):
     assert remaining.iloc[0]["id"] != latest_id # Ensure deleted row is gone
 
 def test_delete_latest_transaction_empty(temp_db):
+    """
+    Calling delete_latest_transaction on an empty database should return None.
+    """
     # Calling delete_latest_transaction on an empty DB should return None
     assert temp_db.delete_latest_transaction() is None
 
 def test_delete_all_transactions(temp_db):
+    """
+    delete_all_transactions should remove all rows from the database.
+    """
     # Add two transactions
     temp_db.add_transaction("2025-09-09", 10, "Food", "Lunch")
     temp_db.add_transaction("2025-09-09", 20, "Drinks", "Bar")

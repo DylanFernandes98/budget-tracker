@@ -1,27 +1,10 @@
-import pytest
-import tkinter as tk
 from unittest.mock import patch
-from budget.ui.app import BudgetApp
-from budget import db
 
-# Fixture for setting up the Tkinter app
-@pytest.fixture
-def app(tmp_path, monkeypatch):
-    # Use a temporary DB instead of the real one
-    test_db = tmp_path / "test_budget.db"
-    monkeypatch.setattr(db, "DB_NAME", str(test_db))
-
-    # Initialise the DB schema
-    db.initialise_database()
-
-    root = tk.Tk() # Creates the Tkinter window
-    root.withdraw() # Hide GUI window
-    app = BudgetApp(root) #Create app with that window
-    yield app # Return the app to the test function
-    root.destroy() #Close Tkinter window
-
-# Valid transaction test
 def test_submit_transaction_valid(app):
+    """
+    Submitting a valid transaction should call add_transaction
+    with correctly formatted values.
+    """
     # Set test values
     app.date_entry.set_date('01-07-2025')
     app.amount_entry.insert(0, "20.50")
@@ -35,8 +18,10 @@ def test_submit_transaction_valid(app):
         # Check that add_transaction was called once with correct args
         mock_add_transaction.assert_called_once_with("2025-07-01", 20.50, "Food", "Groceries")
 
-# Invalid transaction test
 def test_submit_transaction_invalid_amount(app):
+    """
+    If the amount field is invalid, add_transaction should NOT be called.
+    """
     # Set test values
     app.date_entry.set_date('01-07-2025')
     app.amount_entry.insert(0, "") # Invalid empty amount

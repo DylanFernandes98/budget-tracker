@@ -1,27 +1,11 @@
-import pytest
-import tkinter as tk
 import pandas as pd
 from unittest.mock import patch, MagicMock
-from budget.ui.app import BudgetApp
-from budget import db
-
-# Fixture for setting up the Tkinter app
-@pytest.fixture
-def app(tmp_path, monkeypatch):
-    # Use a temporary DB instead of the real one
-    test_db = tmp_path / "test_budget.db"
-    monkeypatch.setattr(db, "DB_NAME", str(test_db))
-
-    # Initialise the DB schema
-    db.initialise_database()
-
-    root = tk.Tk() # Creates the Tkinter window
-    root.withdraw() # Hide GUI window
-    app = BudgetApp(root) #Create app with that window
-    yield app # Return the app to the test function
-    root.destroy() #Close Tkinter window
 
 def test_show_transaction_graph_with_data(app, monkeypatch):
+    """
+    show_transaction_graph should create, draw, and grid the chart widget
+    when valid transaction data exists.
+    """
     # Fake dataframe with 2 rows (so df is NOT empty)
     fake_df = pd.DataFrame({
         "category": ["Food", "Transport"],
@@ -49,5 +33,3 @@ def test_show_transaction_graph_with_data(app, monkeypatch):
 
         # The widget should be gridded inside the frame
         fake_widget.grid.assert_called_once()
-
-
