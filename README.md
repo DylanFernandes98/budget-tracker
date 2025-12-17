@@ -57,7 +57,7 @@ Inspired by budgeting during long-term travel, this project brings together prac
 - Packaged the app as a Python module with a clean `budget/` and `tests/` structure
 - Created and managed a virtual environment with separate dependencies
 - Added unit testing with Pytest, coverage reporting, static type checking with Mypy, and automated testing with GitHub Actions CI
-- Achieved 100% test coverage on database logic and over 70% overall project coverage
+- Achieved 100% test coverage on database logic and 76% overall project coverage
 - Added an option to export transactions as CSV for use in Excel/Sheets
 
 ## 🏗️ Project Architecture
